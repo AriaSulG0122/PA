@@ -20,6 +20,7 @@ char* rl_gets() {
 
   line_read = readline("(nemu) ");
 
+  //***If the line is not null, store the line to the history of the command list for future useage.
   if (line_read && *line_read) {
     add_history(line_read);
   }
@@ -27,6 +28,8 @@ char* rl_gets() {
   return line_read;
 }
 
+//***Why is parameter -1 passed in?
+//***The complement of -1 is the maximum number!!It means looping until cut down.
 static int cmd_c(char *args) {
   cpu_exec(-1);
   return 0;
@@ -37,6 +40,13 @@ static int cmd_q(char *args) {
 }
 
 static int cmd_help(char *args);
+static int cmd_si(char *args);
+static int cmd_info(char *args);
+static int cmd_p(char *args);
+static int cmd_x(char *args);
+static int cmd_w(char *args);
+static int cmd_d(char *args);
+
 
 static struct {
   char *name;
@@ -46,16 +56,20 @@ static struct {
   { "help", "Display informations about all supported commands", cmd_help },
   { "c", "Continue the execution of the program", cmd_c },
   { "q", "Exit NEMU", cmd_q },
-
   /* TODO: Add more commands */
-
+  {"si", "si [N]:Execute N instructions and then stop, default value of [N] is 1",cmd_si},
+  {"info","info r|w:Show the information about regs|watch points",cmd_info},
+  {"p","p EXPR:Count the value of the expression",cmd_p},
+  {"x","x [N] EXPR:Count the value of the expression and then show the memory from the position of this value, totally output [N] consecutive 4 bytes",cmd_x},
+  {"w","w VAR:watch the changes of value",cmd_w},
+  {"d","delete the Nth watch point.",cmd_d}
 };
 
 #define NR_CMD (sizeof(cmd_table) / sizeof(cmd_table[0]))
 
 static int cmd_help(char *args) {
   /* extract the first argument */
-  char *arg = strtok(NULL, " ");
+  char *arg = strtok(NULL, " ");//***use strtok to decompose strings.
   int i;
 
   if (arg == NULL) {
@@ -76,6 +90,14 @@ static int cmd_help(char *args) {
   return 0;
 }
 
+static int cmd_si(char *args) {return -1;}
+static int cmd_info(char *args) {return -1;}
+static int cmd_p(char *args) {return -1;}
+static int cmd_x(char *args) {return -1;}
+static int cmd_w(char *args) {return -1;}
+static int cmd_d(char *args) {return -1;}
+
+//***User interface main loop
 void ui_mainloop(int is_batch_mode) {
   if (is_batch_mode) {
     cmd_c(NULL);
@@ -106,7 +128,7 @@ void ui_mainloop(int is_batch_mode) {
     int i;
     for (i = 0; i < NR_CMD; i ++) {
       if (strcmp(cmd, cmd_table[i].name) == 0) {
-        if (cmd_table[i].handler(args) < 0) { return; }
+        if (cmd_table[i].handler(args) < 0) { return; }//***The command is not exist.
         break;
       }
     }
