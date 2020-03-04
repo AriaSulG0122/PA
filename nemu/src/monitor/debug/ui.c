@@ -145,7 +145,7 @@ static int cmd_x(char *args) {
   int N=0;
   vaddr_t addr;
   if(args==NULL){
-    printf("The args of command 'x' was wrong, please input like: x 39 0x100000\n.");
+    printf("The args of command 'x' was wrong, please input like: x 39 0x100000.\n");
     return 0;
   }
   int nRes=sscanf(args,"%d 0x%x",&N,&addr); //***read the amount of memory to show and the begin address.
