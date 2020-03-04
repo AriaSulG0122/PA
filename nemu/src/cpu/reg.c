@@ -4,13 +4,13 @@
 
 CPU_state cpu;
 
-//const char *regsl[] = {"eax", "ecx", "edx", "ebx", "esp", "ebp", "esi", "edi"};
-//const char *regsw[] = {"ax", "cx", "dx", "bx", "sp", "bp", "si", "di"};
-//const char *regsb[] = {"al", "cl", "dl", "bl", "ah", "ch", "dh", "bh"};
+const char *regsl[] = {"eax", "ecx", "edx", "ebx", "esp", "ebp", "esi", "edi"};
+const char *regsw[] = {"ax", "cx", "dx", "bx", "sp", "bp", "si", "di"};
+const char *regsb[] = {"al", "cl", "dl", "bl", "ah", "ch", "dh", "bh"};
 //***change order
-const char *regsl[] = {"eax", "ebx", "ecx", "edx", "esp", "ebp", "esi", "edi"};
-const char *regsw[] = {"ax", "bx", "cx", "dx", "sp", "bp", "si", "di"};
-const char *regsb[] = {"ah", "al", "bh", "bl", "ch", "cl", "dh", "dl"};
+//const char *regsl[] = {"eax", "ebx", "ecx", "edx", "esp", "ebp", "esi", "edi"};
+//const char *regsw[] = {"ax", "bx", "cx", "dx", "sp", "bp", "si", "di"};
+//const char *regsb[] = {"ah", "al", "bh", "bl", "ch", "cl", "dh", "dl"};
 
 //***Generate random number to test the correctness of regs.
 void reg_test() {
@@ -18,7 +18,6 @@ void reg_test() {
   uint32_t sample[8];
   uint32_t eip_sample = rand();
   cpu.eip = eip_sample;
-
 
   int i;
   for (i = R_EAX; i <= R_EDI; i ++) {
