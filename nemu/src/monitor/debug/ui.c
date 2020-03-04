@@ -111,7 +111,7 @@ static int cmd_info(char *args) {
   if(args!=NULL)
   {
     int nRes=sscanf(args,"%c",&c);
-    if(nRes<=0){
+    if(nRes<=0 || c!='r' || c!='w'){
       printf("The args of command 'info' was wrong, please input 'r' or 'w'.\n");
       return 0;
     }
@@ -128,15 +128,13 @@ static int cmd_info(char *args) {
         }
       }
     }
-    else if (c=='w'){
-      printf("Waiting for perfection...\n");
-    }
-  }
-  else {
+  }else {
        printf("The args of command 'info' was wrong, please input 'r' or 'w'.\n");
-    }
-  return 0;
   }
+  return 0;
+}//***end cmd_info
+  
+
 static int cmd_p(char *args) {return -1;}
 static int cmd_x(char *args) {return -1;}
 static int cmd_w(char *args) {return -1;}
