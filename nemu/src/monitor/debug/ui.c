@@ -128,6 +128,10 @@ static int cmd_info(char *args) {
         }
       }
     }
+    else if (c=='w')
+    {
+      printf("Waiting for perfection...\n");
+    }
   }else {
        printf("The args of command 'info' was wrong, please input 'r' or 'w'.\n");
   }
