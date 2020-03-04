@@ -90,7 +90,22 @@ static int cmd_help(char *args) {
   return 0;
 }
 
-static int cmd_si(char *args) {return -1;}
+//***si [N]:Execute N instructions and then stop, default value of [N] is 1
+static int cmd_si(char *args) 
+{
+  uint64_t N=1;//***The default value of N is 1
+  if(args!=NULL)
+  {
+    int nRes=sscanf(args,"%llu",&N);//***analytic parameter
+    if (nRes<=0){//***Resolution failure
+      printf("The args of command 'si' was wrong, please input integer.\n");
+      return 0;
+    }
+  }
+  cpu_exec(N);//***Do the job
+  
+  return -1;
+}
 static int cmd_info(char *args) {return -1;}
 static int cmd_p(char *args) {return -1;}
 static int cmd_x(char *args) {return -1;}
