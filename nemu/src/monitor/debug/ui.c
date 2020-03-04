@@ -116,6 +116,7 @@ static int cmd_info(char *args) {
       return 0;
     }
     if(c=='r'){
+      printf("eip    0x%x\n",cpu.eip);
       int i;
       for(i=0;i<8;i++)
       {
