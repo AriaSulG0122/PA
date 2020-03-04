@@ -122,9 +122,9 @@ static int cmd_info(char *args) {
         printf("%s    0x%x\n",regsl[i],reg_l(i));
         printf("%s    0x%x\n",regsw[i],reg_w(i));
         if(i<4){
-          int k=2*i+1;
-          printf("%s    0x%x\n",regsb[2*i],reg_b(2*i));
+          int k=i+4;
           printf("%s    0x%x\n",regsb[k],reg_b(k));
+          printf("%s    0x%x\n",regsb[i],reg_b(i));
         }
       }
     }
