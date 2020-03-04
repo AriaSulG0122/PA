@@ -104,9 +104,39 @@ static int cmd_si(char *args)
   }
   cpu_exec(N);//***Do the job
   
-  return 0;
+  return 0;//!!!Be careful!!! Can't Return -1, or you will exit the nemu.
 }
-static int cmd_info(char *args) {return -1;}
+static int cmd_info(char *args) {
+  char c;
+  if(args!=NULL)
+  {
+    int nRes=sscanf(args,"%c",&c);
+    if(nRes<=0){
+      printf("The args of command 'info' was wrong, please input 'r' or 'w'.\n");
+      return 0;
+    }
+    if(c=='r'){
+      int i;
+      for(i=0;i<8;i++)
+      {
+        printf("%s    0x%x\n",regsl[i],reg_l(i));
+        printf("%s    0x%x\n",regsw[i],reg_w(i));
+        if(i<4){
+          int k=2*i+1;
+          printf("%s    0x%x\n",regsb[2*i],reg_b(2*i));
+          printf("%s    0x%x\n",regsb[k],reg_b(k));
+        }
+      }
+    }
+    else if (c=='w'){
+      printf("Waiting for perfection...\n");
+    }
+  }
+  else {
+       printf("The args of command 'info' was wrong, please input 'r' or 'w'.\n");
+    }
+  return 0;
+  }
 static int cmd_p(char *args) {return -1;}
 static int cmd_x(char *args) {return -1;}
 static int cmd_w(char *args) {return -1;}
