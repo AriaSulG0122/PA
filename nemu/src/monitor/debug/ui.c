@@ -144,7 +144,7 @@ static int cmd_p(char *args) {return -1;}
 static int cmd_x(char *args) {
   int N=0;
   vaddr_t addr;
-  int nRes=sscanf(args,"%d 0x%x",&N,&addr); 
+  int nRes=sscanf(args,"%d 0x%x",&N,&addr); //***read the amount of memory to show and the begin address.
   if(nRes<=0)
   {
      printf("The args of command 'x' was wrong, please input integer.");
@@ -153,7 +153,9 @@ static int cmd_x(char *args) {
   printf("Memory situation as follows:\n");
   for(int i=0;i<N;i++)
   {
-    if(i%4==0){printf("\n0x%x:",addr+i);}
+    if(i%4==0){printf("\n02x%x:",addr+i);}
+    //***02x means the output field is 2 wide, right aligned, 
+    //and the insufficient ones are replaced by the character 0.
     printf("  0x%0x",vaddr_read(addr+i,1));
   }
   printf("\n");
