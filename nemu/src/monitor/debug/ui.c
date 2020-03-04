@@ -111,7 +111,7 @@ static int cmd_info(char *args) {
   if(args!=NULL)
   {
     int nRes=sscanf(args,"%c",&c);
-    if(nRes<=0 || c!='r' || c!='w'){
+    if(nRes<=0 || (c!='r' && c!='w') ){
       printf("The args of command 'info' was wrong, please input 'r' or 'w'.\n");
       return 0;
     }
