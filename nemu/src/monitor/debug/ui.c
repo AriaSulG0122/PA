@@ -120,11 +120,11 @@ static int cmd_info(char *args) {
       for(i=0;i<8;i++)
       {
         printf("%s    0x%x\n",regsl[i],reg_l(i));
-        printf("%s      0x%x\n",regsw[i],reg_w(i));
+        printf("  %s    0x%x\n",regsw[i],reg_w(i));
         if(i<4){
           int k=i+4;
-          printf("%s        0x%x\n",regsb[k],reg_b(k));
-          printf("%s        0x%x\n",regsb[i],reg_b(i));
+          printf("    %s    0x%x\n",regsb[k],reg_b(k));
+          printf("    %s    0x%x\n",regsb[i],reg_b(i));
         }
       }
     }
