@@ -104,7 +104,7 @@ static int cmd_si(char *args)
   }
   cpu_exec(N);//***Do the job
   
-  return -1;
+  return 0;
 }
 static int cmd_info(char *args) {return -1;}
 static int cmd_p(char *args) {return -1;}
