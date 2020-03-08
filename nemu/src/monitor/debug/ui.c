@@ -140,7 +140,13 @@ static int cmd_info(char *args) {
 }//***end cmd_info
   
 
-static int cmd_p(char *args) {return -1;}
+static int cmd_p(char *args) {
+  bool success;
+  int res=expr(args,&success);
+  if (success==false){printf("The EXPR is error!\n");}
+  else{printf("The value of EXPR is:%d\n",res);}
+  return 0;
+  }
 static int cmd_x(char *args) {
   int N=0;
   vaddr_t addr;

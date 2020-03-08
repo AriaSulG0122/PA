@@ -6,13 +6,16 @@
 #include <sys/types.h>
 #include <regex.h>
 
+//***Single character token uses ASCII as type, multi character token defines in enum
+//***Why start from 256? Because single character has used 0-255(ASCII)
 enum {
-  TK_NOTYPE = 256, TK_EQ
+  TK_NOTYPE = 256, TK_EQ, TK_NUMBER
 
   /* TODO: Add more token types */
 
 };
 
+//***This struct record two things: regular expressions and corresponding types
 static struct rule {
   char *regex;
   int token_type;
@@ -22,11 +25,20 @@ static struct rule {
    * Pay attention to the precedence level of different rules.
    */
 
-  {" +", TK_NOTYPE},    // spaces
+  {" +", TK_NOTYPE},    // spaces, and " +" means one or more blank space
+  {"0|[1-9][0-9]*"},    // numbers
+
   {"\\+", '+'},         // plus
+  {"\\-", '-'},         // minus
+  {"\\*", '*'},         // mul
+  {"\\/", '/'},         // div
+  
+  {"\\(", '('},         // LB
+  {"\\)", ')'},         // RB
   {"==", TK_EQ}         // equal
 };
 
+//***Record the number of rules
 #define NR_REGEX (sizeof(rules) / sizeof(rules[0]) )
 
 static regex_t re[NR_REGEX];
@@ -48,9 +60,10 @@ void init_regex() {
   }
 }
 
+//***record the type of token, for some token like number, also need to record its value in str[32]
 typedef struct token {
   int type;
-  char str[32];
+  char str[32];//***what if out of buffer? assert(0)!
 } Token;
 
 Token tokens[32];
@@ -78,6 +91,17 @@ static bool make_token(char *e) {
          * to record the token in the array `tokens'. For certain types
          * of tokens, some extra actions should be performed.
          */
+        if(substr_len>32){assert(0);}//***if out of buffer, prompt error
+        if(rules[i].token_type==TK_NOTYPE){break;}//***discard spaces
+        tokens[nr_token].type=rules[i].token_type;
+        switch(rules[i].token_type){
+          case TK_NUMBER:
+            strncpy(tokens[nr_token].str,substr_start,substr_len);
+            *(tokens[nr_token].str+substr_len)='\0';//***Append end character at the end
+            break;
+          //default:
+        }
+        nr_token++;
         break;
       }
     }
