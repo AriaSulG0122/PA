@@ -97,7 +97,8 @@ static bool make_token(char *e) {
         switch(rules[i].token_type){
           case TK_NUMBER:
             strncpy(tokens[nr_token].str,substr_start,substr_len);
-            //*(tokens[nr_token].str+substr_len)='\0';//***Append end character at the end
+            *(tokens[nr_token].str+substr_len)='\0';
+            //*** '\0' is usually placed at the end of a string, indicating the end of the string
             break;
           default:TODO();
         }
