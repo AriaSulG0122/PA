@@ -100,7 +100,7 @@ static bool make_token(char *e) {
             *(tokens[nr_token].str+substr_len)='\0';
             //*** '\0' is usually placed at the end of a string, indicating the end of the string
             break;
-          default:TODO();
+          //default:TODO();
         }
         nr_token++;
         break;
