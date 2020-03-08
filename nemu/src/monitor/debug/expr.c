@@ -166,7 +166,7 @@ int eval(int p,int q)
     int op,val1,val2,op_type;
     op=find_domainantOp(p,q);
     op_type=tokens[op].type;
-    printf("%d\n",op_type);
+    printf("op_type:%d,p:%d,q:%d,op:%d\n",op_type,p,q,op);
     val1=eval(p,op-1);
     val2=eval(op+1,q);
     switch(op_type){
