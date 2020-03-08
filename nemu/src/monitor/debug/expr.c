@@ -116,7 +116,7 @@ bool check_parentheses(int p,int q)
 {
   if(p>=q){printf("Error:p>=q in check_parenthese\n");return false;}
   if(tokens[p].type!='('||tokens[q].type!=')'){
-    printf("Error:the whole expression is not surrounded by a matched pair of parentheses");
+    panic("Error:the whole expression is not surrounded by a matched pair of parentheses");
     return false;
     }
   int count=0;
