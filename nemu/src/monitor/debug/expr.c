@@ -146,7 +146,7 @@ int find_domainantOp(int p,int q)
     if(tokens[cur].type=='*'||tokens[cur].type=='/') {pos[1]=cur;}
   }
   if(pos[0]!=-1){return pos[0];}
-  else if(pos[0]!=-1){return pos[1];}
+  else if(pos[1]!=-1){return pos[1];}
   else {return -1;}
 }
 
