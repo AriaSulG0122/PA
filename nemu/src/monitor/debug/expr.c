@@ -155,7 +155,7 @@ int eval(int p,int q)
 {
   if(p>q){panic("Error:p>q in eval\n");return -1;}//******Panic will show in red color!!!
   else if(p==q){//single token. This token should be a number;
-    if(tokens[p].type!=TK_NUMBER){printf("Error:The single token should be a number\n");return -1;}
+    if(tokens[p].type!=TK_NUMBER){panic("Error:The single token should be a number\n");return -1;}
     int value=0,i=0;
     while(tokens[p].str[i]!='\0'){value=value*10+tokens[p].str[i]-48;i++;}//***count the value of number
     return value;
@@ -166,6 +166,7 @@ int eval(int p,int q)
     int op,val1,val2,op_type;
     op=find_domainantOp(p,q);
     op_type=tokens[op].type;
+    printf("%d\n",op_type);
     val1=eval(p,op-1);
     val2=eval(op+1,q);
     switch(op_type){
