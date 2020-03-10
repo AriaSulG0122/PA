@@ -153,7 +153,7 @@ int find_domainantOp(int p,int q)
 //***count the value of a expression
 int eval(int p,int q)
 {
-  if(p>q){panic("Error:p>q in eval\n");return -1;}//******Panic will show in red color!!!
+  if(p>q){printf("Error:p>q in eval\n");return -1;}//******Panic will show in red color!!!
   else if(p==q){//single token. This token should be a number;
     if(tokens[p].type!=TK_NUMBER){panic("Error:The single token should be a number\n");return -1;}
     int value=0,i=0;
