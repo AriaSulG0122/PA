@@ -150,7 +150,6 @@ static int cmd_p(char *args) {
 
 static int cmd_x(char *args) {
   int N=0;
-  vaddr_t addr=0;
   if(args==NULL){
     printf("The args of command 'x' was wrong, please input like: x 39 0x100000.\n");
     return 0;
@@ -164,12 +163,12 @@ static int cmd_x(char *args) {
      return 0;
   }
   bool success;
-  int addr_value=expr(addr_expr,&success);
+  vaddr_t addr_value=expr(addr_expr,&success);
   if (success==false||addr_value<0){panic("The EXPR of address is error!\n");}
   printf("Memory situation as follows:");
   for(int i=0;i<N;i++)
   {
-    printf("0x%x: 0x%02x\n",addr_value+i*4,vaddr_read(addr+i,4));
+    printf("0x%x: 0x%02x\n",addr_value+i*4,vaddr_read(addr_value+i*4,4));
     //***02x means the output field is 2 wide, right aligned, 
     //***and the insufficient ones are replaced by the character 0.
   }
