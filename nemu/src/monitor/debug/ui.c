@@ -155,7 +155,7 @@ static int cmd_x(char *args) {
     printf("The args of command 'x' was wrong, please input like: x 39 0x100000.\n");
     return 0;
   }
-  char* addr_expr=NULL;
+  char *addr_expr=NULL;
   int nRes=sscanf(args,"%d %s",&N,addr_expr); //***read the amount of memory to show and the begin address.
   if(nRes<=0)
   {
@@ -163,7 +163,7 @@ static int cmd_x(char *args) {
      return 0;
   }
   bool success;
-  int addr_value=expr(args,&success);
+  int addr_value=expr(addr_expr,&success);
   if (success==false||addr_value<0){panic("The EXPR of address is error!\n");}
   printf("Memory situation as follows:");
   for(int i=0;i<N;i++)
