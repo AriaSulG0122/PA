@@ -35,6 +35,7 @@ static int cmd_c(char *args) {
   return 0;
 }
 
+//***exit nemu
 static int cmd_q(char *args) {
   return -1;
 }
@@ -71,7 +72,6 @@ static int cmd_help(char *args) {
   /* extract the first argument */
   char *arg = strtok(NULL, " ");//***use strtok to decompose strings.
   int i;
-
   if (arg == NULL) {
     /* no argument given */
     for (i = 0; i < NR_CMD; i ++) {
@@ -106,6 +106,7 @@ static int cmd_si(char *args)
   
   return 0;//!!!Be careful!!! Can't Return -1, or you will exit the nemu.
 }
+
 static int cmd_info(char *args) {
   char c;
   if(args!=NULL)
@@ -138,7 +139,6 @@ static int cmd_info(char *args) {
   }
   return 0;
 }//***end cmd_info
-  
 
 static int cmd_p(char *args) {
   bool success;
@@ -146,32 +146,36 @@ static int cmd_p(char *args) {
   if (success==false){printf("The EXPR is error!\n");}
   else{printf("The value of EXPR is:%d\n",res);}
   return 0;
-  }
-  
+}
+
 static int cmd_x(char *args) {
   int N=0;
-  vaddr_t addr;
+  vaddr_t addr=0;
   if(args==NULL){
     printf("The args of command 'x' was wrong, please input like: x 39 0x100000.\n");
     return 0;
   }
-  int nRes=sscanf(args,"%d 0x%x",&N,&addr); //***read the amount of memory to show and the begin address.
+  char* addr_expr=NULL;
+  int nRes=sscanf(args,"%d %s",&N,addr_expr); //***read the amount of memory to show and the begin address.
   if(nRes<=0)
   {
-     printf("The args of command 'x' was wrong, please input like: x 39 0x100000.\n");
+     panic("The args of command 'x' was wrong, please input like: x 39 0x100000.\n");
      return 0;
   }
+  bool success;
+  int addr_value=expr(args,&success);
+  if (success==false||addr_value<0){panic("The EXPR of address is error!\n");}
   printf("Memory situation as follows:");
   for(int i=0;i<N;i++)
   {
-    if(i%4==0){printf("\n0x%x:",addr+i);}
-    printf("  0x%02x",vaddr_read(addr+i,1));
+    printf("0x%x: 0x%02x\n",addr_value+i*4,vaddr_read(addr+i,4));
     //***02x means the output field is 2 wide, right aligned, 
     //***and the insufficient ones are replaced by the character 0.
   }
   printf("\n");
   return 0;
 }
+
 static int cmd_w(char *args) {return -1;}
 static int cmd_d(char *args) {return -1;}
 
@@ -183,18 +187,18 @@ void ui_mainloop(int is_batch_mode) {
   }
 
   while (1) {
-    char *str = rl_gets();
-    char *str_end = str + strlen(str);
+    char *str = rl_gets();//***get the args which user inputs.
+    char *str_end = str + strlen(str);//***get the end of the line
 
     /* extract the first token as the command */
     char *cmd = strtok(str, " ");
-    if (cmd == NULL) { continue; }
+    if (cmd == NULL) { continue; }//***if no command, continue
 
     /* treat the remaining string as the arguments,
      * which may need further parsing
      */
     char *args = cmd + strlen(cmd) + 1;
-    if (args >= str_end) {
+    if (args >= str_end) {//***There is no argument, and there is just a command.
       args = NULL;
     }
 
@@ -206,7 +210,7 @@ void ui_mainloop(int is_batch_mode) {
     int i;
     for (i = 0; i < NR_CMD; i ++) {
       if (strcmp(cmd, cmd_table[i].name) == 0) {
-        if (cmd_table[i].handler(args) < 0) { return; }//***The command is not exist.
+        if (cmd_table[i].handler(args) < 0) { return; }//******If return value of cmd_? < 0，exit the nemu!!
         break;
       }
     }
