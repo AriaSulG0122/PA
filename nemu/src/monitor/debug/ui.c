@@ -154,7 +154,7 @@ static int cmd_x(char *args) {
     printf("The args of command 'x' was wrong, please input like: x 39 0x100000.\n");
     return 0;
   }
-  char addr_expr[20];
+  char addr_expr[20];//*Why can't pointer?
   int nRes=sscanf(args,"%d %s",&N,addr_expr); //***read the amount of memory to show and the begin address.
   printf("%s\n",addr_expr);
   if(nRes<=0)
@@ -176,7 +176,10 @@ static int cmd_x(char *args) {
   return 0;
 }
 
-static int cmd_w(char *args) {return -1;}
+static int cmd_w(char *args) {
+    new_wp(args);
+    return 0;
+  }
 static int cmd_d(char *args) {return -1;}
 
 //***User interface main loop
