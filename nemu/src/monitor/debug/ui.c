@@ -132,7 +132,9 @@ static int cmd_info(char *args) {
     }
     else if (c=='w')
     {
-      printf("Waiting for perfection...\n");
+      //printf("Waiting for perfection...\n");
+      print_wp();
+      return 0;
     }
   }else {
        printf("The args of command 'info' was wrong, please input 'r' or 'w'.\n");
@@ -175,12 +177,23 @@ static int cmd_x(char *args) {
   printf("\n");
   return 0;
 }
-
+//***set new watchpoint
 static int cmd_w(char *args) {
     new_wp(args);
     return 0;
+}
+//***delete a watchpoint which number is read from args
+static int cmd_d(char *args) {
+  int num=0;
+  int nRes=sscanf(args,"%d",&num);
+  if(nRes<=0){
+    panic("Error:args wrong in cmd_d, please input number of watchpoint\n");
   }
-static int cmd_d(char *args) {return -1;}
+  nRes=free_wp(num);
+  if(nRes){printf("Success to delete watchpoint No:%d\n",num);}
+  else{printf("Error:the No.%d watchpoint does not exist\n",num);}
+  return 0;
+}
 
 //***User interface main loop
 void ui_mainloop(int is_batch_mode) {
