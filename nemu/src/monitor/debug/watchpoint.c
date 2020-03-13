@@ -85,7 +85,7 @@ void print_wp(){
   printf("Watchpoint Situation:\n");
   WP *tempNode=head;
   while(tempNode!=NULL){
-    printf("No:%d   Target:%s   TitTimes:%d   CurrentValue:%d",tempNode->NO,tempNode->tar,tempNode->hitNum,tempNode->old_value);
+    printf("No:%d   Target:%s   TitTimes:%d   CurrentValue:%d\n",tempNode->NO,tempNode->tar,tempNode->hitNum,tempNode->old_value);
     tempNode=tempNode->next;
   }
 }
