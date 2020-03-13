@@ -81,11 +81,11 @@ bool free_wp(int num){
 
 //***Print the info of a wp
 void print_wp(){
-  if(head==NULL){panic("There is no watch point.\n");}
+  if(head==NULL){printf("There is no watch point now.\n");return;}
   printf("Watchpoint Situation:\n");
   WP *tempNode=head;
   while(tempNode!=NULL){
-    printf("No:%d   Target:%s   TitTimes:%d   CurrentValue:%d\n",tempNode->NO,tempNode->tar,tempNode->hitNum,tempNode->old_value);
+    printf("No:%d   Target:%s   HitTimes:%d   CurrentValue:%d\n",tempNode->NO,tempNode->tar,tempNode->hitNum,tempNode->old_value);
     tempNode=tempNode->next;
   }
 }
