@@ -3,15 +3,9 @@
 
 #include "common.h"
 
-//***declare 32bit Regs.
 enum { R_EAX, R_ECX, R_EDX, R_EBX, R_ESP, R_EBP, R_ESI, R_EDI };
-//enum { R_EAX, R_EBX, R_ECX, R_EDX, R_ESP, R_EBP, R_ESI, R_EDI };
-//***declare 16bit Regs.
 enum { R_AX, R_CX, R_DX, R_BX, R_SP, R_BP, R_SI, R_DI };
-//enum { R_AX, R_BX, R_CX, R_DX, R_SP, R_BP, R_SI, R_DI };
-//***declare 8bit Regs.
 enum { R_AL, R_CL, R_DL, R_BL, R_AH, R_CH, R_DH, R_BH };
-//enum { R_AH, R_AL, R_BH, R_BL, R_CH, R_CL, R_DH, R_DL };
 
 /* TODO: Re-organize the `CPU_state' structure to match the register
  * encoding scheme in i386 instruction format. For example, if we
@@ -19,23 +13,20 @@ enum { R_AL, R_CL, R_DL, R_BL, R_AH, R_CH, R_DH, R_BH };
  * cpu.gpr[1]._8[1], we will get the 'ch' register. Hint: Use `union'.
  * For more details about the register encoding scheme, see i386 manual.
  */
-// ***Notice big end addressing , small end addressing
+
 typedef struct {
   /* Do NOT change the order of the GPRs' definitions. */
   /* In NEMU, rtlreg_t is exactly uint32_t. This makes RTL instructions
    * in PA2 able to directly access these registers.
    */
-  union
-  {
+  union{
     union{
       uint32_t _32;
       uint16_t _16;
       uint8_t _8[2];
     } gpr[8];
-
     struct{
       rtlreg_t eax, ecx, edx, ebx, esp, ebp, esi, edi;
-      //rtlreg_t eax, ebx, ecx, edx, esp, ebp, esi, edi;
     };
   };
   vaddr_t eip;
@@ -43,17 +34,14 @@ typedef struct {
 } CPU_state;
 
 extern CPU_state cpu;
-//***The reg index should between 0~7
+
 static inline int check_reg_index(int index) {
   assert(index >= 0 && index < 8);
   return index;
 }
-//***I guess: l-->long, w-->word, b-->byte
-//***return regsl[i]
+
 #define reg_l(index) (cpu.gpr[check_reg_index(index)]._32)
-//***return regsw[i]
 #define reg_w(index) (cpu.gpr[check_reg_index(index)]._16)
-//***return regsb[i]
 #define reg_b(index) (cpu.gpr[check_reg_index(index) & 0x3]._8[index >> 2])
 
 extern const char* regsl[];
@@ -63,9 +51,9 @@ extern const char* regsb[];
 static inline const char* reg_name(int index, int width) {
   assert(index >= 0 && index < 8);
   switch (width) {
+    case 4: return regsl[index];
     case 1: return regsb[index];
     case 2: return regsw[index];
-    case 4: return regsl[index];
     default: assert(0);
   }
 }
