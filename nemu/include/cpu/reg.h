@@ -39,19 +39,22 @@ typedef struct {
     };
   };
   vaddr_t eip;
-} CPU_state;
-extern CPU_state cpu;
 
+} CPU_state;
+
+extern CPU_state cpu;
 //***The reg index should between 0~7
 static inline int check_reg_index(int index) {
   assert(index >= 0 && index < 8);
   return index;
 }
 //***I guess: l-->long, w-->word, b-->byte
-
-#define reg_l(index) (cpu.gpr[check_reg_index(index)]._32)//***return the value of regsl[i]
-#define reg_w(index) (cpu.gpr[check_reg_index(index)]._16)//***return the value of regsw[i]
-#define reg_b(index) (cpu.gpr[check_reg_index(index) & 0x3]._8[index >> 2])//***return the value of regsb[i]
+//***return regsl[i]
+#define reg_l(index) (cpu.gpr[check_reg_index(index)]._32)
+//***return regsw[i]
+#define reg_w(index) (cpu.gpr[check_reg_index(index)]._16)
+//***return regsb[i]
+#define reg_b(index) (cpu.gpr[check_reg_index(index) & 0x3]._8[index >> 2])
 
 extern const char* regsl[];
 extern const char* regsw[];
