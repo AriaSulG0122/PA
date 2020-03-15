@@ -14,7 +14,7 @@ uint8_t pmem[PMEM_SIZE];
 //***Get the last 8|16|24|32 bits of pmem_rw(addr,uint32_t)
 uint32_t paddr_read(paddr_t addr, int len) {
   return pmem_rw(addr, uint32_t) & (~0u >> ((4 - len) << 3));
-  //***(4-len)<<3 = (4-len)*2^3,  ~ = take inverse
+  //***(4-len)<<3 = (4-len)*2^3,     ~ = take inverse
 }
 
 void paddr_write(paddr_t addr, int len, uint32_t data) {
