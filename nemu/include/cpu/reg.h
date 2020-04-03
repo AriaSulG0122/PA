@@ -4,6 +4,7 @@
 #include "common.h"
 
 //***declare 32bit Regs.
+//这八个通用寄存器是RTL寄存器
 enum { R_EAX, R_ECX, R_EDX, R_EBX, R_ESP, R_EBP, R_ESI, R_EDI };
 //enum { R_EAX, R_EBX, R_ECX, R_EDX, R_ESP, R_EBP, R_ESI, R_EDI };
 //***declare 16bit Regs.
@@ -35,25 +36,24 @@ typedef struct {
 
     struct{
       rtlreg_t eax, ecx, edx, ebx, esp, ebp, esi, edi;
-      //rtlreg_t eax, ebx, ecx, edx, esp, ebp, esi, edi;
     };
   };
   vaddr_t eip;
-
 } CPU_state;
-
 extern CPU_state cpu;
+
 //***The reg index should between 0~7
 static inline int check_reg_index(int index) {
   assert(index >= 0 && index < 8);
   return index;
 }
 //***I guess: l-->long, w-->word, b-->byte
-//***return regsl[i]
+
+//***return the value of regsl[i]
 #define reg_l(index) (cpu.gpr[check_reg_index(index)]._32)
-//***return regsw[i]
+//***return the value of regsw[i]
 #define reg_w(index) (cpu.gpr[check_reg_index(index)]._16)
-//***return regsb[i]
+//***return the value of regsb[i]
 #define reg_b(index) (cpu.gpr[check_reg_index(index) & 0x3]._8[index >> 2])
 
 extern const char* regsl[];

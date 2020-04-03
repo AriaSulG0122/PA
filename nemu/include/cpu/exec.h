@@ -3,11 +3,14 @@
 
 #include "nemu.h"
 
+//定义一个执行阶段相关的helper，函数，concat用于拼接，在这里拼接为exec_[name]，作为函数名
+//最后的效果就是make_EHelper(name) 等效于函数 void exec_[name] (vaddr_t *eip)
 #define make_EHelper(name) void concat(exec_, name) (vaddr_t *eip)
-typedef void (*EHelper) (vaddr_t *);
+typedef void (*EHelper) (vaddr_t *);//typedef为复杂的声明定义了一个简单的别名，为EHelper
 
 #include "cpu/decode.h"
-
+    
+//读取指令的len字节长度
 static inline uint32_t instr_fetch(vaddr_t *eip, int len) {
   uint32_t instr = vaddr_read(*eip, len);
 #ifdef DEBUG

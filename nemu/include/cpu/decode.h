@@ -22,20 +22,21 @@ typedef struct {
   char str[OP_STR_SIZE];
 } Operand;
 
+
 typedef struct {
-  uint32_t opcode;
-  vaddr_t seq_eip;  // sequential eip
+  uint32_t opcode;  //记录指令操作
+  vaddr_t seq_eip;  // sequential eip，记录指令
   bool is_operand_size_16;
   uint8_t ext_opcode;
   bool is_jmp;
   vaddr_t jmp_eip;
-  Operand src, dest, src2;
+  Operand src, dest, src2;//two source operands and one destination operand
 #ifdef DEBUG
   char assembly[80];
   char asm_buf[128];
   char *p;
 #endif
-} DecodeInfo;
+} DecodeInfo;//记录一些全局译码信息供后续使用,包括操作数的类型,宽度,值等信息
 
 typedef union {
   struct {
@@ -67,6 +68,7 @@ void operand_write(Operand *, rtlreg_t *);
 /* shared by all helper functions */
 extern DecodeInfo decoding;
 
+//定义三个宏，方便访问两个源操作数(src,src2)和一个目的操作数(dest)
 #define id_src (&decoding.src)
 #define id_src2 (&decoding.src2)
 #define id_dest (&decoding.dest)

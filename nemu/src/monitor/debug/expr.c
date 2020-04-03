@@ -25,7 +25,6 @@ static struct rule {
   char *regex;
   int token_type;
 } rules[] = {
-
   /* TODO: Add more rules.
    * Pay attention to the precedence level of different rules.
    */
@@ -172,7 +171,12 @@ int find_domainantOp(int p,int q)
   for(int cur=p;cur<=q;cur++)
   {
     if(tokens[cur].type=='('){count++;}
-    if(tokens[cur].type==')'){count--;if(count<0){panic("Error: the parentheses are not matched.");return 0;}}
+    if(tokens[cur].type==')'){
+      count--;
+      if(count<0){
+        panic("Error: the parentheses are not matched.");return 0;
+        }
+    }
     if(count>0){continue;}//***token inside a pair of parentheses is not dominant operator.
     //***level=0
     switch(tokens[cur].type){

@@ -2,10 +2,12 @@
 #include "cpu/rtl.h"
 
 /* shared by all helper functions */
-DecodeInfo decoding;
-rtlreg_t t0, t1, t2, t3;
-const rtlreg_t tzero = 0;
+DecodeInfo decoding;//记录一些全局译码信息供后续使用,包括操作数的类型,宽度,值等信息
+rtlreg_t t0, t1, t2, t3;//临时寄存器
+const rtlreg_t tzero = 0;//0寄存器
 
+//操作数译码函数
+//把操作数信息记录在结构体op中，load_val参数会控制是否需要将该操作数读出到全局译码信息decoding供后续使用
 #define make_DopHelper(name) void concat(decode_op_, name) (vaddr_t *eip, Operand *op, bool load_val)
 
 /* Refer to Appendix A in i386 manual for the explanations of these abbreviations */
@@ -14,7 +16,7 @@ const rtlreg_t tzero = 0;
 static inline make_DopHelper(I) {
   /* eip here is pointing to the immediate */
   op->type = OP_TYPE_IMM;
-  op->imm = instr_fetch(eip, op->width);
+  op->imm = instr_fetch(eip, op->width);//获取指令中的立即数
   rtl_li(&op->val, op->imm);
 
 #ifdef DEBUG
@@ -304,8 +306,9 @@ make_DHelper(out_a2dx) {
 #endif
 }
 
+//会根据第一个参数记录的类型的不同进行相应的写操作,包括写寄存器和写内存
 void operand_write(Operand *op, rtlreg_t* src) {
-  if (op->type == OP_TYPE_REG) { rtl_sr(op->reg, op->width, src); }
-  else if (op->type == OP_TYPE_MEM) { rtl_sm(&op->addr, op->width, src); }
+  if (op->type == OP_TYPE_REG) { rtl_sr(op->reg, op->width, src); }//写寄存器
+  else if (op->type == OP_TYPE_MEM) { rtl_sm(&op->addr, op->width, src); }//写内存
   else { assert(0); }
 }

@@ -1,10 +1,11 @@
 #include "cpu/exec.h"
 #include "all-instr.h"
 
+//decode记录译码函数，execute为执行函数，width为宽度信息
 typedef struct {
-  DHelper decode;
-  EHelper execute;
-  int width;
+  DHelper decode;   //译码函数
+  EHelper execute;  //执行函数
+  int width;    //宽度信息
 } opcode_entry;
 
 #define IDEXW(id, ex, w)   {concat(decode_, id), concat(exec_, ex), w}
@@ -13,6 +14,7 @@ typedef struct {
 #define EX(ex)             EXW(ex, 0)
 #define EMPTY              EX(inv)
 
+//将操作数的宽度信息记录在全局译码信息decoding中
 static inline void set_width(int width) {
   if (width == 0) {
     width = decoding.is_operand_size_16 ? 2 : 4;
@@ -24,8 +26,8 @@ static inline void set_width(int width) {
 static inline void idex(vaddr_t *eip, opcode_entry *e) {
   /* eip is pointing to the byte next to opcode */
   if (e->decode)
-    e->decode(eip);
-  e->execute(eip);
+    e->decode(eip);//译码
+    e->execute(eip);//执行
 }
 
 static make_EHelper(2byte_esc);
@@ -70,7 +72,8 @@ make_group(gp7,
     EMPTY, EMPTY, EMPTY, EMPTY)
 
 /* TODO: Add more instructions!!! */
-
+//***Decoding lookup table
+//每一个 opcode 对应相应指令的译码函数,执行函数,以及操作数宽度
 opcode_entry opcode_table [512] = {
   /* 0x00 */	EMPTY, EMPTY, EMPTY, EMPTY,
   /* 0x04 */	EMPTY, EMPTY, EMPTY, EMPTY,
@@ -213,24 +216,25 @@ static make_EHelper(2byte_esc) {
 }
 
 make_EHelper(real) {
-  uint32_t opcode = instr_fetch(eip, 1);
-  decoding.opcode = opcode;
-  set_width(opcode_table[opcode].width);
-  idex(eip, &opcode_table[opcode]);
+  uint32_t opcode = instr_fetch(eip, 1);//取指，得到指令的第一个字节，将其解释成opcode
+  decoding.opcode = opcode;//将opcode记录在全局译码信息decoding中
+  set_width(opcode_table[opcode].width);//查表获取操作数宽度信息，通过set_width函数将其记录在全局译码信息decoding中
+  idex(eip, &opcode_table[opcode]);//对指令进行进一步的译码与执行
 }
 
 static inline void update_eip(void) {
   cpu.eip = (decoding.is_jmp ? (decoding.is_jmp = 0, decoding.jmp_eip) : decoding.seq_eip);
 }
 
+//***exec current eip instruction and then update eip
 void exec_wrapper(bool print_flag) {
 #ifdef DEBUG
   decoding.p = decoding.asm_buf;
   decoding.p += sprintf(decoding.p, "%8x:   ", cpu.eip);
 #endif
 
-  decoding.seq_eip = cpu.eip;
-  exec_real(&decoding.seq_eip);
+  decoding.seq_eip = cpu.eip;//保存当前的%eip到全局译码信息decoding的成员seq_eip中
+  exec_real(&decoding.seq_eip);//将其地址作为参数传入exec_real函数中，进行取指、译码、执行
 
 #ifdef DEBUG
   int instr_len = decoding.seq_eip - cpu.eip;
@@ -246,7 +250,7 @@ void exec_wrapper(bool print_flag) {
   uint32_t eip = cpu.eip;
 #endif
 
-  update_eip();
+  update_eip();//更新eip
 
 #ifdef DIFF_TEST
   void difftest_step(uint32_t);
