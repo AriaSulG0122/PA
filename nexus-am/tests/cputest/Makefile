@@ -17,7 +17,7 @@ run: all
 
 clean: 
 	rm -rf Makefile.* build/
-make dummy:
+run dummy:
 	make ARCH=x86-nemu ALL=dummy run
 
 latest:
