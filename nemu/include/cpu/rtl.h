@@ -7,6 +7,7 @@ extern rtlreg_t t0, t1, t2, t3;//临时寄存器
 extern const rtlreg_t tzero;//0寄存器
 
 /* RTL basic instructions */
+//RTL基本指令
 
 //立即数读入
 static inline void rtl_li(rtlreg_t* dest, uint32_t imm) {
@@ -97,6 +98,8 @@ static inline void rtl_sr_l(int r, const rtlreg_t* src1) {
 }
 
 /* RTL psuedo instructions */
+//RTL伪指令
+
 //带宽度的通用寄存器读取
 static inline void rtl_lr(rtlreg_t* dest, int r, int width) {
   switch (width) {
@@ -150,7 +153,9 @@ static inline void rtl_sext(rtlreg_t* dest, const rtlreg_t* src1, int width) {
 static inline void rtl_push(const rtlreg_t* src1) {
   // esp <- esp - 4
   // M[esp] <- src1
-  TODO();
+  //TODO();
+  rtl_subi(&cpu.esp,&cpu.esp,4);
+  rtl_sm(&cpu.esp,4,src1);
 }
 
 static inline void rtl_pop(rtlreg_t* dest) {

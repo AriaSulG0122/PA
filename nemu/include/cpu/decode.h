@@ -72,9 +72,9 @@ extern DecodeInfo decoding;
 #define id_src (&decoding.src)
 #define id_src2 (&decoding.src2)
 #define id_dest (&decoding.dest)
-
+//定义一个译码阶段相关的helper函数
 #define make_DHelper(name) void concat(decode_, name) (vaddr_t *eip)
-typedef void (*DHelper) (vaddr_t *);
+typedef void (*DHelper) (vaddr_t *);//后续利用DHelper就能代表整个函数类型{void (*DHelper) (vaddr_t *);}
 
 make_DHelper(I2E);
 make_DHelper(I2a);

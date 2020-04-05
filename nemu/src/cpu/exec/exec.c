@@ -5,7 +5,7 @@
 typedef struct {
   DHelper decode;   //译码函数
   EHelper execute;  //执行函数
-  int width;    //宽度信息
+  int width;        //操作数宽度信息
 } opcode_entry;
 
 #define IDEXW(id, ex, w)   {concat(decode_, id), concat(exec_, ex), w}
@@ -73,6 +73,7 @@ make_group(gp7,
 
 /* TODO: Add more instructions!!! */
 //***Decoding lookup table
+//全局译码表
 //每一个 opcode 对应相应指令的译码函数,执行函数,以及操作数宽度
 opcode_entry opcode_table [512] = {
   /* 0x00 */	EMPTY, EMPTY, EMPTY, EMPTY,
@@ -133,7 +134,7 @@ opcode_entry opcode_table [512] = {
   /* 0xdc */	EMPTY, EMPTY, EMPTY, EMPTY,
   /* 0xe0 */	EMPTY, EMPTY, EMPTY, EMPTY,
   /* 0xe4 */	EMPTY, EMPTY, EMPTY, EMPTY,
-  /* 0xe8 */	EMPTY, EMPTY, EMPTY, EMPTY,
+  /* 0xe8 */	IDEX(J,call), EMPTY, EMPTY, EMPTY,
   /* 0xec */	EMPTY, EMPTY, EMPTY, EMPTY,
   /* 0xf0 */	EMPTY, EMPTY, EMPTY, EMPTY,
   /* 0xf4 */	EMPTY, EMPTY, IDEXW(E, gp3, 1), IDEX(E, gp3),
@@ -217,12 +218,13 @@ static make_EHelper(2byte_esc) {
 
 make_EHelper(real) {
   uint32_t opcode = instr_fetch(eip, 1);//取指，得到指令的第一个字节，将其解释成opcode
+  //Why 第一个字节能确定？opcode_table提供了512个指令位
   decoding.opcode = opcode;//将opcode记录在全局译码信息decoding中
   set_width(opcode_table[opcode].width);//查表获取操作数宽度信息，通过set_width函数将其记录在全局译码信息decoding中
   idex(eip, &opcode_table[opcode]);//对指令进行进一步的译码与执行
 }
 
-static inline void update_eip(void) {
+static inline void update_eip(void) {//如果要跳转，首先初始化跳转指令，再跳；否则顺序执行
   cpu.eip = (decoding.is_jmp ? (decoding.is_jmp = 0, decoding.jmp_eip) : decoding.seq_eip);
 }
 
