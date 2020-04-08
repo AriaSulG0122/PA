@@ -224,7 +224,8 @@ make_EHelper(real) {
   idex(eip, &opcode_table[opcode]);//对指令进行进一步的译码与执行
 }
 
-static inline void update_eip(void) {//如果要跳转，首先初始化跳转指令，再跳；否则顺序执行
+static inline void update_eip(void) {//如果要跳转(decoing.is_jmp=1)，首先初始化跳转指令，再跳(eip=decoing.jmp_eip)；
+                                     //否则顺序执行(eip=decoing.seq_eip)
   cpu.eip = (decoding.is_jmp ? (decoding.is_jmp = 0, decoding.jmp_eip) : decoding.seq_eip);
 }
 

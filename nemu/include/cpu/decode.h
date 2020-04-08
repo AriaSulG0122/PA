@@ -29,7 +29,7 @@ typedef struct {
   bool is_operand_size_16;
   uint8_t ext_opcode;
   bool is_jmp;
-  vaddr_t jmp_eip;
+  vaddr_t jmp_eip;  // 记录jmp地址
   Operand src, dest, src2;//two source operands and one destination operand
 #ifdef DEBUG
   char assembly[80];

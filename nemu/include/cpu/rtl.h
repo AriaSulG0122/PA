@@ -67,7 +67,7 @@ static inline void rtl_idiv(rtlreg_t* q, rtlreg_t* r, const rtlreg_t* src1_hi, c
 static inline void rtl_lm(rtlreg_t *dest, const rtlreg_t* addr, int len) {
   *dest = vaddr_read(*addr, len);
 }
-//RTL基本指令，写内存
+//RTL基本指令，写内存，store memory
 static inline void rtl_sm(rtlreg_t* addr, int len, const rtlreg_t* src1) {
   vaddr_write(*addr, len, *src1);
 }
@@ -150,12 +150,13 @@ static inline void rtl_sext(rtlreg_t* dest, const rtlreg_t* src1, int width) {
   TODO();
 }
 
+//pushl %eax  ==   subl $4,%esp + movl %eax,(%esp)
 static inline void rtl_push(const rtlreg_t* src1) {
   // esp <- esp - 4
   // M[esp] <- src1
   //TODO();
   rtl_subi(&cpu.esp,&cpu.esp,4);
-  rtl_sm(&cpu.esp,4,src1);
+  rtl_sm(&cpu.esp,4,src1);//利用rtl_sm(store memory)，在esp处存入长度为4的src1
 }
 
 static inline void rtl_pop(rtlreg_t* dest) {

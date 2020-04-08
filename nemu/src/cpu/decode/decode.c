@@ -41,6 +41,7 @@ static inline make_DopHelper(SI) {
    op->simm = ???
    */
   //TODO();
+  //利用instr_fetch从eip开始读取op->width长度的指令，然后赋值给op->simm
   op->simm=instr_fetch(eip,op->width);
 
   rtl_li(&op->val, op->simm);
@@ -92,6 +93,7 @@ static inline make_DopHelper(r) {
  * Rd
  * Sw
  */
+//实现对Mod/RM字节解析
 static inline void decode_op_rm(vaddr_t *eip, Operand *rm, bool load_rm_val, Operand *reg, bool load_reg_val) {
   read_ModR_M(eip, rm, load_rm_val, reg, load_reg_val);
 }
