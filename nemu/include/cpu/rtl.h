@@ -100,7 +100,7 @@ static inline void rtl_sr_l(int r, const rtlreg_t* src1) {
 /* RTL psuedo instructions */
 //RTL伪指令
 
-//带宽度的通用寄存器读取
+//带宽度的通用寄存器读取，dest为目标地址，r为要读的寄存器编号，width为要读取的长度
 static inline void rtl_lr(rtlreg_t* dest, int r, int width) {
   switch (width) {
     case 4: rtl_lr_l(dest, r); return;
