@@ -165,9 +165,11 @@ static inline void rtl_pop(rtlreg_t* dest) {
   TODO();
 }
 
+//判断目标值是否为零，为零则dest为1，否则dest为0
 static inline void rtl_eq0(rtlreg_t* dest, const rtlreg_t* src1) {
   // dest <- (src1 == 0 ? 1 : 0)
-  TODO();
+  //TODO();
+  *dest=*src1==0?1:0;
 }
 
 static inline void rtl_eqi(rtlreg_t* dest, const rtlreg_t* src1, int imm) {
@@ -180,19 +182,25 @@ static inline void rtl_neq0(rtlreg_t* dest, const rtlreg_t* src1) {
   TODO();
 }
 
+//获取最高位
 static inline void rtl_msb(rtlreg_t* dest, const rtlreg_t* src1, int width) {
   // dest <- src1[width * 8 - 1]
-  TODO();
+  //TODO();
+  rtl_shri(dest,src1,width*8-1);
 }
 
 static inline void rtl_update_ZF(const rtlreg_t* result, int width) {
   // eflags.ZF <- is_zero(result[width * 8 - 1 .. 0])
-  TODO();
+  //TODO();
+  t0=(*result&(~0u>>((4-width)<<3)))==0;//根据输入参数width的大小，1、2、3、4分别会返回对应地址的 8、16、24、32位情况，然后判断其是否为0
+  rtl_set_ZF(&t0);
 }
 
 static inline void rtl_update_SF(const rtlreg_t* result, int width) {
   // eflags.SF <- is_sign(result[width * 8 - 1 .. 0])
-  TODO();
+  //TODO();
+  rtl_msb(&t0,result,width);
+  rtl_set_SF(&t0);
 }
 
 static inline void rtl_update_ZFSF(const rtlreg_t* result, int width) {
