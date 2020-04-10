@@ -17,7 +17,7 @@ static inline make_DopHelper(I) {
   /* eip here is pointing to the immediate */
   op->type = OP_TYPE_IMM;
   op->imm = instr_fetch(eip, op->width);//获取指令中的立即数
-  rtl_li(&op->val, op->imm);
+  rtl_li(&op->val, op->imm);//将op->imm赋值给op->val
 
 #ifdef DEBUG
   snprintf(op->str, OP_STR_SIZE, "$0x%x", op->imm);
@@ -29,6 +29,7 @@ static inline make_DopHelper(I) {
  * function to decode it.
  */
 /* sign immediate */
+//立即数读取
 static inline make_DopHelper(SI) {
   assert(op->width == 1 || op->width == 4);
 
@@ -44,7 +45,7 @@ static inline make_DopHelper(SI) {
   //利用instr_fetch从eip开始读取op->width长度的指令，然后赋值给op->simm
   op->simm=instr_fetch(eip,op->width);
 
-  rtl_li(&op->val, op->simm);
+  rtl_li(&op->val, op->simm);//将立即数值记录到op->val中
 
 #ifdef DEBUG
   snprintf(op->str, OP_STR_SIZE, "$0x%x", op->simm);
@@ -185,7 +186,7 @@ make_DHelper(I) {
 }
 
 make_DHelper(r) {
-  decode_op_r(eip, id_dest, true);
+  decode_op_r(eip, id_dest, true);//读取寄存器信息到id_dest中，这里需要全局信息存储，因为后面的push指令会访问到
 }
 
 make_DHelper(E) {
@@ -265,10 +266,11 @@ make_DHelper(a2O) {
   decode_op_O(eip, id_dest, false);
 }
 
+//*Jump
 make_DHelper(J) {
-  decode_op_SI(eip, id_dest, false);
+  decode_op_SI(eip, id_dest, false);//将立即数值记录到操作数id_dest中，因为后面一条指令会记录decoding.jmp_eip，不需要再进行全局存储了，所以load_val=false
   // the target address can be computed in the decode stage
-  decoding.jmp_eip = id_dest->simm + *eip;
+  decoding.jmp_eip = id_dest->simm + *eip;//根据读取到的立即数值设置跳转地址
 }
 
 make_DHelper(push_SI) {

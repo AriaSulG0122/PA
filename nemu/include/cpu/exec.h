@@ -10,7 +10,7 @@ typedef void (*EHelper) (vaddr_t *);//typedef为复杂的声明定义了一个�
 
 #include "cpu/decode.h"
     
-//读取指令的len字节长度
+//读取指令的len字节长度，然后eip前进len字节
 static inline uint32_t instr_fetch(vaddr_t *eip, int len) {
   uint32_t instr = vaddr_read(*eip, len);
 #ifdef DEBUG
@@ -20,7 +20,7 @@ static inline uint32_t instr_fetch(vaddr_t *eip, int len) {
     decoding.p += sprintf(decoding.p, "%02x ", p_instr[i]);
   }
 #endif
-  (*eip) += len;
+  (*eip) += len;//eip前进len字节
   return instr;
 }
 

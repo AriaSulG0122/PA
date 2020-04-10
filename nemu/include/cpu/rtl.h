@@ -7,9 +7,9 @@ extern rtlreg_t t0, t1, t2, t3;//临时寄存器
 extern const rtlreg_t tzero;//0寄存器
 
 /* RTL basic instructions */
-//RTL基本指令
+//***RTL基本指令
 
-//立即数读入
+//立即数读入,load immediate
 static inline void rtl_li(rtlreg_t* dest, uint32_t imm) {
   *dest = imm;
 }
@@ -36,7 +36,7 @@ static inline void rtl_li(rtlreg_t* dest, uint32_t imm) {
   }
 
 ////RTL基本指令，算数运算和逻辑运算
-make_rtl_arith_logic(add)
+make_rtl_arith_logic(add)//得到 rtl_add 与 rtl_addi
 make_rtl_arith_logic(sub)
 make_rtl_arith_logic(and)
 make_rtl_arith_logic(or)
@@ -63,11 +63,11 @@ static inline void rtl_idiv(rtlreg_t* q, rtlreg_t* r, const rtlreg_t* src1_hi, c
   asm volatile("idiv %4" : "=a"(*q), "=d"(*r) : "d"(*src1_hi), "a"(*src1_lo), "r"(*src2));
 }
 
-//RTL基本指令，读内存
+//RTL基本指令，读内存，loadmemory。从addr处读取len长度的地址到dest中
 static inline void rtl_lm(rtlreg_t *dest, const rtlreg_t* addr, int len) {
   *dest = vaddr_read(*addr, len);
 }
-//RTL基本指令，写内存，store memory
+//RTL基本指令，写内存，store memory。将长度为len的src1写到地址addr中（最终通过strcpy完成此功能）
 static inline void rtl_sm(rtlreg_t* addr, int len, const rtlreg_t* src1) {
   vaddr_write(*addr, len, *src1);
 }
@@ -122,10 +122,10 @@ static inline void rtl_sr(int r, int width, const rtlreg_t* src1) {
 //set为写，get为读
 #define make_rtl_setget_eflags(f) \
   static inline void concat(rtl_set_, f) (const rtlreg_t* src) { \
-    TODO(); \
+    cpu.f=*src;/*TODO();*/ \
   } \
   static inline void concat(rtl_get_, f) (rtlreg_t* dest) { \
-    TODO(); \
+    *dest=cpu.f;/*TODO();*/ \
   }
 
 //EFLAGS标志位的读写

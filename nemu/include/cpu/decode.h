@@ -9,25 +9,26 @@ enum { OP_TYPE_REG, OP_TYPE_MEM, OP_TYPE_IMM };//三种操作数类型，分别�
 
 #define OP_STR_SIZE 40
 
+//记录操作数的信息，如操作数类型、操作数宽度、操作数值等
 typedef struct {
   uint32_t type;
   int width;
   union {
-    uint32_t reg;
-    rtlreg_t addr;
-    uint32_t imm;
-    int32_t simm;
+    uint32_t reg;//记录寄存器编号
+    rtlreg_t addr;//属于rtl寄存器，记录访存地址
+    uint32_t imm;//记录非负立即数
+    int32_t simm;//记录立即数
   };
-  rtlreg_t val;
+  rtlreg_t val;//属于rtl寄存器，记录操作数内容
   char str[OP_STR_SIZE];
 } Operand;
 
-
+//记录一些全局译码信息供后续使用,包括操作码、操作数、指令地址等
 typedef struct {
-  uint32_t opcode;  //记录指令操作
-  vaddr_t seq_eip;  // sequential eip，记录指令
-  bool is_operand_size_16;
-  uint8_t ext_opcode;
+  uint32_t opcode;  // 记录操作码
+  vaddr_t seq_eip;  // sequential eip，记录顺序指令
+  bool is_operand_size_16;  
+  uint8_t ext_opcode;//记录拓展指令字段，位于ModR/M中间三位
   bool is_jmp;
   vaddr_t jmp_eip;  // 记录jmp地址
   Operand src, dest, src2;//two source operands and one destination operand
@@ -36,7 +37,7 @@ typedef struct {
   char asm_buf[128];
   char *p;
 #endif
-} DecodeInfo;//记录一些全局译码信息供后续使用,包括操作数的类型,宽度,值等信息
+} DecodeInfo;
 
 typedef union {
   struct {
@@ -48,6 +49,7 @@ typedef union {
     uint8_t dont_care	:3;
     uint8_t opcode		:3;
   };
+  //中间三位是reg/opcode域，指明寄存器编号或者作为操作码的延长位
   uint8_t val;
 } ModR_M;
 
@@ -66,7 +68,7 @@ void read_ModR_M(vaddr_t *, Operand *, bool, Operand *, bool);
 void operand_write(Operand *, rtlreg_t *);
 
 /* shared by all helper functions */
-extern DecodeInfo decoding;
+extern DecodeInfo decoding;//decoding中记录了全局译码信息
 
 //定义三个宏，方便访问两个源操作数(src,src2)和一个目的操作数(dest)
 #define id_src (&decoding.src)

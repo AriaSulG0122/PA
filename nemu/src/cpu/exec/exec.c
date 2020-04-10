@@ -16,8 +16,8 @@ typedef struct {
 
 //将操作数的宽度信息记录在全局译码信息decoding中
 static inline void set_width(int width) {
-  if (width == 0) {
-    width = decoding.is_operand_size_16 ? 2 : 4;
+  if (width == 0) {//若width等于零，进行判断
+    width = decoding.is_operand_size_16 ? 2 : 4;//如果operand_size_16，则width为2;否则width为4，即32位
   }
   decoding.src.width = decoding.dest.width = decoding.src2.width = width;
 }
@@ -32,6 +32,8 @@ static inline void idex(vaddr_t *eip, opcode_entry *e) {
 
 static make_EHelper(2byte_esc);
 
+//声明一组opcode_table_gp[x] [8]，每一个元素都包含函数opcode_table_gp[x] [i]，该函数最终落实到IDEXW(id,ex,w)
+/*idex一句将根据decoding的ext_opcode来确定执行哪个函数*/
 #define make_group(name, item0, item1, item2, item3, item4, item5, item6, item7) \
   static opcode_entry concat(opcode_table_, name) [8] = { \
     /* 0x00 */	item0, item1, item2, item3, \
@@ -44,7 +46,7 @@ static make_EHelper(name) { \
 /* 0x80, 0x81, 0x83 */
 make_group(gp1,
     EMPTY, EMPTY, EMPTY, EMPTY,
-    EMPTY, EMPTY, EMPTY, EMPTY)
+    EMPTY, EX(sub), EMPTY, EMPTY)
 
   /* 0xc0, 0xc1, 0xd0, 0xd1, 0xd2, 0xd3 */
 make_group(gp2,
@@ -96,8 +98,8 @@ opcode_entry opcode_table [512] = {
   /* 0x44 */	EMPTY, EMPTY, EMPTY, EMPTY,
   /* 0x48 */	EMPTY, EMPTY, EMPTY, EMPTY,
   /* 0x4c */	EMPTY, EMPTY, EMPTY, EMPTY,
-  /* 0x50 */	IDEX(r,push), IDEX(r,push), IDEX(r,push), IDEX(r,push),
-  /* 0x54 */	IDEX(r,push), IDEX(r,push), IDEX(r,push), IDEX(r,push),
+  /* 0x50 */	IDEX(r,push), IDEX(r,push), IDEX(r,push), IDEX(r,push),//实现push,GPR
+  /* 0x54 */	IDEX(r,push), IDEX(r,push), IDEX(r,push), IDEX(r,push),//实现push,GPR
   /* 0x58 */	EMPTY, EMPTY, EMPTY, EMPTY,
   /* 0x5c */	EMPTY, EMPTY, EMPTY, EMPTY,
   /* 0x60 */	EMPTY, EMPTY, EMPTY, EMPTY,
@@ -108,7 +110,7 @@ opcode_entry opcode_table [512] = {
   /* 0x74 */	EMPTY, EMPTY, EMPTY, EMPTY,
   /* 0x78 */	EMPTY, EMPTY, EMPTY, EMPTY,
   /* 0x7c */	EMPTY, EMPTY, EMPTY, EMPTY,
-  /* 0x80 */	IDEXW(I2E, gp1, 1), IDEX(I2E, gp1), EMPTY, IDEX(SI2E, gp1),
+  /* 0x80 */	IDEXW(I2E, gp1, 1), IDEX(I2E, gp1), EMPTY, IDEX(SI2E, gp1),//实现sub，83 ec。ec:1110 1100。中间三位是101，为5，故EX(sub)填入gp1[5]
   /* 0x84 */	EMPTY, EMPTY, EMPTY, EMPTY,
   /* 0x88 */	IDEXW(mov_G2E, mov, 1), IDEX(mov_G2E, mov), IDEXW(mov_E2G, mov, 1), IDEX(mov_E2G, mov),
   /* 0x8c */	EMPTY, EMPTY, EMPTY, EMPTY,
@@ -134,7 +136,7 @@ opcode_entry opcode_table [512] = {
   /* 0xdc */	EMPTY, EMPTY, EMPTY, EMPTY,
   /* 0xe0 */	EMPTY, EMPTY, EMPTY, EMPTY,
   /* 0xe4 */	EMPTY, EMPTY, EMPTY, EMPTY,
-  /* 0xe8 */	IDEX(J,call), EMPTY, EMPTY, EMPTY,
+  /* 0xe8 */	IDEX(J,call), EMPTY, EMPTY, EMPTY,//实现call
   /* 0xec */	EMPTY, EMPTY, EMPTY, EMPTY,
   /* 0xf0 */	EMPTY, EMPTY, EMPTY, EMPTY,
   /* 0xf4 */	EMPTY, EMPTY, IDEXW(E, gp3, 1), IDEX(E, gp3),
@@ -224,6 +226,7 @@ make_EHelper(real) {
   idex(eip, &opcode_table[opcode]);//对指令进行进一步的译码与执行
 }
 
+//更新eip
 static inline void update_eip(void) {//如果要跳转(decoing.is_jmp=1)，首先初始化跳转指令，再跳(eip=decoing.jmp_eip)；
                                      //否则顺序执行(eip=decoing.seq_eip)
   cpu.eip = (decoding.is_jmp ? (decoding.is_jmp = 0, decoding.jmp_eip) : decoding.seq_eip);
