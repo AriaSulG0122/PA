@@ -162,7 +162,7 @@ static inline void rtl_push(const rtlreg_t* src1) {
 static inline void rtl_pop(rtlreg_t* dest) {
   // dest <- M[esp]
   // esp <- esp + 4
-  TODO();
+  //TODO();
   rtl_lm(dest,&cpu.esp,4);//利用rtl_lm(load memory)，从esp处取出长度为4字节的数据存入dest
   rtl_addi(&cpu.esp,&cpu.esp,4);
 }
