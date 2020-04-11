@@ -162,7 +162,9 @@ static inline void rtl_push(const rtlreg_t* src1) {
 static inline void rtl_pop(rtlreg_t* dest) {
   // dest <- M[esp]
   // esp <- esp + 4
-  TODO();
+  //TODO();
+  rtl_sm(&cpu.esp,4,dest);//利用rtl_sm(store memory)，在esp处存入长度为4的src1
+  rtl_addi(&cpu.esp,&cpu.esp,4);
 }
 
 //判断目标值是否为零，为零则dest为1，否则dest为0
