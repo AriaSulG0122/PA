@@ -163,7 +163,7 @@ static inline void rtl_pop(rtlreg_t* dest) {
   // dest <- M[esp]
   // esp <- esp + 4
   //TODO();
-  rtl_sm(&cpu.esp,4,dest);//利用rtl_sm(store memory)，在esp处存入长度为4的src1
+  rtl_lm(dest,&cpu.esp,4);//利用rtl_lm(load memory)，从esp处取出长度为4字节的数据存入dest
   rtl_addi(&cpu.esp,&cpu.esp,4);
 }
 
