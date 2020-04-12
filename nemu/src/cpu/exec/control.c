@@ -25,14 +25,17 @@ make_EHelper(jmp_rm) {
 
 make_EHelper(call) {
   // the target address is calculated at the decode stage
-  TODO();
+  //TODO();
+  decoding.is_jmp=1;//This is jump instruction
+  rtl_push(eip);
 
   print_asm("call %x", decoding.jmp_eip);
 }
 
 make_EHelper(ret) {
-  TODO();
-
+  //TODO();
+  rtl_pop(&decoding.jmp_eip);//取出栈顶保存的eip值，然后将其设置为跳转的eip值
+  decoding.is_jmp=1;//指令跳转为真
   print_asm("ret");
 }
 

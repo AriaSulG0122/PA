@@ -56,7 +56,7 @@ bool free_wp(int num){
     return false;
   }
   curNode=head;
-  if(head->NO==num){//***judge head first for 
+  if(head->NO==num){//***judge head first
     head=head->next;
   }
   else{
@@ -85,7 +85,8 @@ void print_wp(){
   printf("Watchpoint Situation:\n");
   WP *tempNode=head;
   while(tempNode!=NULL){
-    printf("No:%d   Target:%s   HitTimes:%d   CurrentValue:%d\n",tempNode->NO,tempNode->tar,tempNode->hitNum,tempNode->old_value);
+    printf("No:%d   Target:%s   HitTimes:%d   CurrentValue:%d\n"
+    ,tempNode->NO,tempNode->tar,tempNode->hitNum,tempNode->old_value);
     tempNode=tempNode->next;
   }
 }

@@ -16,7 +16,7 @@
 
 typedef uint8_t bool;
 
-typedef uint32_t rtlreg_t;
+typedef uint32_t rtlreg_t;//RTL寄存器是 RTL 指令专门使用的寄存器.在NEMU中,RTL寄存器统一使用rtlreg_t来定义
 
 typedef uint32_t paddr_t;
 typedef uint32_t vaddr_t;

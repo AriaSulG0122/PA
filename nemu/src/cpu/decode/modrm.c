@@ -2,14 +2,15 @@
 #include "cpu/rtl.h"
 
 void load_addr(vaddr_t *eip, ModR_M *m, Operand *rm) {
-  assert(m->mod != 3);
+  assert(m->mod != 3);//断言，m的mod字段必然不等于3
 
-  int32_t disp = 0;
+  //进行初始化
+  int32_t disp = 0;//记录偏移
   int disp_size = 4;
-  int base_reg = -1, index_reg = -1, scale = 0;
+  int base_reg = -1, index_reg = -1, scale = 0;//SIB
   rtl_li(&rm->addr, 0);
 
-  if (m->R_M == R_ESP) {
+  if (m->R_M == R_ESP) {//如果R_M字段对应寄存器ESP
     SIB s;
     s.val = instr_fetch(eip, 1);
     base_reg = s.base;
@@ -77,14 +78,15 @@ void load_addr(vaddr_t *eip, ModR_M *m, Operand *rm) {
   rm->type = OP_TYPE_MEM;
 }
 
+//解析ModR_M字段
 void read_ModR_M(vaddr_t *eip, Operand *rm, bool load_rm_val, Operand *reg, bool load_reg_val) {
   ModR_M m;
-  m.val = instr_fetch(eip, 1);
-  decoding.ext_opcode = m.opcode;
-  if (reg != NULL) {
-    reg->type = OP_TYPE_REG;
-    reg->reg = m.reg;
-    if (load_reg_val) {
+  m.val = instr_fetch(eip, 1);//先获取ModR_M字段值，一个字节
+  decoding.ext_opcode = m.opcode;//获取拓展指令字段
+  if (reg != NULL) {//如果Operand reg不为空，则表明中间三比特字段为寄存器的编号
+    reg->type = OP_TYPE_REG;//操作数类型为OP_TYPE_REG
+    reg->reg = m.reg;//记录操作数的寄存器编号
+    if (load_reg_val) {//如果需要加载操作数值，则加载到reg->val中
       rtl_lr(&reg->val, reg->reg, reg->width);
     }
 
@@ -93,7 +95,7 @@ void read_ModR_M(vaddr_t *eip, Operand *rm, bool load_rm_val, Operand *reg, bool
 #endif
   }
 
-  if (m.mod == 3) {
+  if (m.mod == 3) {//如果ModR_M前两比特的mod字段是11，则表明末三比特的R_M字段是寄存器编号
     rm->type = OP_TYPE_REG;
     rm->reg = m.R_M;
     if (load_rm_val) {
@@ -104,7 +106,7 @@ void read_ModR_M(vaddr_t *eip, Operand *rm, bool load_rm_val, Operand *reg, bool
     sprintf(rm->str, "%%%s", reg_name(m.R_M, rm->width));
 #endif
   }
-  else {
+  else {//否则对Operand rm进行加载
     load_addr(eip, &m, rm);
     if (load_rm_val) {
       rtl_lm(&rm->val, &rm->addr, rm->width);

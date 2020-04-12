@@ -3,11 +3,13 @@
 
 #include "nemu.h"
 
-extern rtlreg_t t0, t1, t2, t3;
-extern const rtlreg_t tzero;
+extern rtlreg_t t0, t1, t2, t3;//临时寄存器
+extern const rtlreg_t tzero;//0寄存器
 
 /* RTL basic instructions */
+//***RTL基本指令
 
+//立即数读入,load immediate
 static inline void rtl_li(rtlreg_t* dest, uint32_t imm) {
   *dest = imm;
 }
@@ -23,6 +25,8 @@ static inline void rtl_li(rtlreg_t* dest, uint32_t imm) {
 #define c_slt(a, b) ((int32_t)(a) < (int32_t)(b))
 #define c_sltu(a, b) ((a) < (b))
 
+//寄存器-寄存器类型rtl_[name]
+//立即数-寄存器类型rtl_[name]i
 #define make_rtl_arith_logic(name) \
   static inline void concat(rtl_, name) (rtlreg_t* dest, const rtlreg_t* src1, const rtlreg_t* src2) { \
     *dest = concat(c_, name) (*src1, *src2); \
@@ -31,8 +35,8 @@ static inline void rtl_li(rtlreg_t* dest, uint32_t imm) {
     *dest = concat(c_, name) (*src1, imm); \
   }
 
-
-make_rtl_arith_logic(add)
+////RTL基本指令，算数运算和逻辑运算
+make_rtl_arith_logic(add)//得到 rtl_add 与 rtl_addi
 make_rtl_arith_logic(sub)
 make_rtl_arith_logic(and)
 make_rtl_arith_logic(or)
@@ -59,40 +63,44 @@ static inline void rtl_idiv(rtlreg_t* q, rtlreg_t* r, const rtlreg_t* src1_hi, c
   asm volatile("idiv %4" : "=a"(*q), "=d"(*r) : "d"(*src1_hi), "a"(*src1_lo), "r"(*src2));
 }
 
+//RTL基本指令，读内存，loadmemory。从addr处读取len长度的地址到dest中
 static inline void rtl_lm(rtlreg_t *dest, const rtlreg_t* addr, int len) {
   *dest = vaddr_read(*addr, len);
 }
-
+//RTL基本指令，写内存，store memory。将长度为len的src1写到地址addr中（最终通过strcpy完成此功能）
 static inline void rtl_sm(rtlreg_t* addr, int len, const rtlreg_t* src1) {
   vaddr_write(*addr, len, *src1);
 }
 
+//RTL基本指令，通用寄存器b的读取
 static inline void rtl_lr_b(rtlreg_t* dest, int r) {
   *dest = reg_b(r);
 }
-
+//RTL基本指令，通用寄存器w的读取
 static inline void rtl_lr_w(rtlreg_t* dest, int r) {
   *dest = reg_w(r);
 }
-
+//RTL基本指令，通用寄存器l的读取
 static inline void rtl_lr_l(rtlreg_t* dest, int r) {
   *dest = reg_l(r);
 }
-
+//RTL基本指令，通用寄存器b的写入
 static inline void rtl_sr_b(int r, const rtlreg_t* src1) {
   reg_b(r) = *src1;
 }
-
+//RTL基本指令，通用寄存器w的写入
 static inline void rtl_sr_w(int r, const rtlreg_t* src1) {
   reg_w(r) = *src1;
 }
-
+//RTL基本指令，通用寄存器l的写入
 static inline void rtl_sr_l(int r, const rtlreg_t* src1) {
   reg_l(r) = *src1;
 }
 
 /* RTL psuedo instructions */
+//RTL伪指令
 
+//带宽度的通用寄存器读取，dest为目标地址，r为要读的寄存器编号，width为要读取的长度
 static inline void rtl_lr(rtlreg_t* dest, int r, int width) {
   switch (width) {
     case 4: rtl_lr_l(dest, r); return;
@@ -101,7 +109,7 @@ static inline void rtl_lr(rtlreg_t* dest, int r, int width) {
     default: assert(0);
   }
 }
-
+//带宽度的通用寄存器写入
 static inline void rtl_sr(int r, int width, const rtlreg_t* src1) {
   switch (width) {
     case 4: rtl_sr_l(r, src1); return;
@@ -111,19 +119,22 @@ static inline void rtl_sr(int r, int width, const rtlreg_t* src1) {
   }
 }
 
+//set为写，get为读
 #define make_rtl_setget_eflags(f) \
   static inline void concat(rtl_set_, f) (const rtlreg_t* src) { \
-    TODO(); \
+    cpu.f=*src;/*TODO();*/ \
   } \
   static inline void concat(rtl_get_, f) (rtlreg_t* dest) { \
-    TODO(); \
+    *dest=cpu.f;/*TODO();*/ \
   }
 
+//EFLAGS标志位的读写
 make_rtl_setget_eflags(CF)
 make_rtl_setget_eflags(OF)
 make_rtl_setget_eflags(ZF)
 make_rtl_setget_eflags(SF)
 
+//数据移动
 static inline void rtl_mv(rtlreg_t* dest, const rtlreg_t *src1) {
   // dest <- src1
   TODO();
@@ -133,27 +144,34 @@ static inline void rtl_not(rtlreg_t* dest) {
   // dest <- ~dest
   TODO();
 }
-
+//符号拓展
 static inline void rtl_sext(rtlreg_t* dest, const rtlreg_t* src1, int width) {
   // dest <- signext(src1[(width * 8 - 1) .. 0])
   TODO();
 }
 
+//pushl %eax  ==   subl $4,%esp + movl %eax,(%esp)
 static inline void rtl_push(const rtlreg_t* src1) {
   // esp <- esp - 4
   // M[esp] <- src1
-  TODO();
+  //TODO();
+  rtl_subi(&cpu.esp,&cpu.esp,4);
+  rtl_sm(&cpu.esp,4,src1);//利用rtl_sm(store memory)，在esp处存入长度为4的src1
 }
 
 static inline void rtl_pop(rtlreg_t* dest) {
   // dest <- M[esp]
   // esp <- esp + 4
-  TODO();
+  //TODO();
+  rtl_lm(dest,&cpu.esp,4);//利用rtl_lm(load memory)，从esp处取出长度为4字节的数据存入dest
+  rtl_addi(&cpu.esp,&cpu.esp,4);
 }
 
+//判断目标值是否为零，为零则dest为1，否则dest为0
 static inline void rtl_eq0(rtlreg_t* dest, const rtlreg_t* src1) {
   // dest <- (src1 == 0 ? 1 : 0)
-  TODO();
+  //TODO();
+  *dest=*src1==0?1:0;
 }
 
 static inline void rtl_eqi(rtlreg_t* dest, const rtlreg_t* src1, int imm) {
@@ -166,19 +184,25 @@ static inline void rtl_neq0(rtlreg_t* dest, const rtlreg_t* src1) {
   TODO();
 }
 
+//获取最高位
 static inline void rtl_msb(rtlreg_t* dest, const rtlreg_t* src1, int width) {
   // dest <- src1[width * 8 - 1]
-  TODO();
+  //TODO();
+  rtl_shri(dest,src1,width*8-1);
 }
 
 static inline void rtl_update_ZF(const rtlreg_t* result, int width) {
   // eflags.ZF <- is_zero(result[width * 8 - 1 .. 0])
-  TODO();
+  //TODO();
+  t0=(*result&(~0u>>((4-width)<<3)))==0;//根据输入参数width的大小，1、2、3、4分别会返回对应地址的 8、16、24、32位情况，然后判断其是否为0
+  rtl_set_ZF(&t0);
 }
 
 static inline void rtl_update_SF(const rtlreg_t* result, int width) {
   // eflags.SF <- is_sign(result[width * 8 - 1 .. 0])
-  TODO();
+  //TODO();
+  rtl_msb(&t0,result,width);
+  rtl_set_SF(&t0);
 }
 
 static inline void rtl_update_ZFSF(const rtlreg_t* result, int width) {

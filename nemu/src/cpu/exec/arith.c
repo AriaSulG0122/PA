@@ -6,8 +6,25 @@ make_EHelper(add) {
   print_asm_template2(add);
 }
 
+//与sbb十分相似，主要区别在于CF位不用处理
 make_EHelper(sub) {
-  TODO();
+  //TODO();
+  rtl_sub(&t2, &id_dest->val, &id_src->val);
+  rtl_sltu(&t3, &id_dest->val, &t2);
+
+  operand_write(id_dest, &t2);//完成计算，写入结果
+
+  rtl_update_ZFSF(&t2, id_dest->width);//更新ZF与SF位
+  //设置CF位
+  rtl_sltu(&t0, &id_dest->val, &t2);
+  rtl_or(&t0, &t3, &t0);
+  rtl_set_CF(&t0);
+  //设置OF位
+  rtl_xor(&t0, &id_dest->val, &id_src->val);
+  rtl_xor(&t1, &id_dest->val, &t2);
+  rtl_and(&t0, &t0, &t1);
+  rtl_msb(&t0, &t0, id_dest->width);
+  rtl_set_OF(&t0);
 
   print_asm_template2(sub);
 }
@@ -62,16 +79,18 @@ make_EHelper(adc) {
 make_EHelper(sbb) {
   rtl_sub(&t2, &id_dest->val, &id_src->val);
   rtl_sltu(&t3, &id_dest->val, &t2);
+  //处理CF位
   rtl_get_CF(&t1);
   rtl_sub(&t2, &t2, &t1);
-  operand_write(id_dest, &t2);
 
-  rtl_update_ZFSF(&t2, id_dest->width);
+  operand_write(id_dest, &t2);//完成计算，写入结果
 
+  rtl_update_ZFSF(&t2, id_dest->width);//更新ZF与SF位
+  //设置CF位
   rtl_sltu(&t0, &id_dest->val, &t2);
   rtl_or(&t0, &t3, &t0);
   rtl_set_CF(&t0);
-
+  //设置OF位
   rtl_xor(&t0, &id_dest->val, &id_src->val);
   rtl_xor(&t1, &id_dest->val, &t2);
   rtl_and(&t0, &t0, &t1);

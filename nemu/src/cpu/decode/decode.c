@@ -2,10 +2,12 @@
 #include "cpu/rtl.h"
 
 /* shared by all helper functions */
-DecodeInfo decoding;
-rtlreg_t t0, t1, t2, t3;
-const rtlreg_t tzero = 0;
+DecodeInfo decoding;//记录一些全局译码信息供后续使用,包括操作数的类型,宽度,值等信息
+rtlreg_t t0, t1, t2, t3;//临时寄存器
+const rtlreg_t tzero = 0;//0寄存器
 
+//操作数译码函数
+//把操作数信息记录在结构体op中，load_val参数会控制是否需要将该操作数读出到全局译码信息decoding供后续使用
 #define make_DopHelper(name) void concat(decode_op_, name) (vaddr_t *eip, Operand *op, bool load_val)
 
 /* Refer to Appendix A in i386 manual for the explanations of these abbreviations */
@@ -14,8 +16,8 @@ const rtlreg_t tzero = 0;
 static inline make_DopHelper(I) {
   /* eip here is pointing to the immediate */
   op->type = OP_TYPE_IMM;
-  op->imm = instr_fetch(eip, op->width);
-  rtl_li(&op->val, op->imm);
+  op->imm = instr_fetch(eip, op->width);//获取指令中的立即数
+  rtl_li(&op->val, op->imm);//将op->imm赋值给op->val
 
 #ifdef DEBUG
   snprintf(op->str, OP_STR_SIZE, "$0x%x", op->imm);
@@ -27,6 +29,7 @@ static inline make_DopHelper(I) {
  * function to decode it.
  */
 /* sign immediate */
+//立即数读取
 static inline make_DopHelper(SI) {
   assert(op->width == 1 || op->width == 4);
 
@@ -38,9 +41,11 @@ static inline make_DopHelper(SI) {
    *
    op->simm = ???
    */
-  TODO();
+  //TODO();
+  //利用instr_fetch从eip开始读取op->width长度的指令，然后赋值给op->simm
+  op->simm=instr_fetch(eip,op->width);
 
-  rtl_li(&op->val, op->simm);
+  rtl_li(&op->val, op->simm);//将立即数值记录到op->val中
 
 #ifdef DEBUG
   snprintf(op->str, OP_STR_SIZE, "$0x%x", op->simm);
@@ -69,8 +74,8 @@ static inline make_DopHelper(a) {
  */
 static inline make_DopHelper(r) {
   op->type = OP_TYPE_REG;
-  op->reg = decoding.opcode & 0x7;
-  if (load_val) {
+  op->reg = decoding.opcode & 0x7;//将opcode的末三位和0x111做与运算，找到对应的寄存器
+  if (load_val) {//如果需要读取信息，则进行全局读取
     rtl_lr(&op->val, op->reg, op->width);
   }
 
@@ -89,6 +94,7 @@ static inline make_DopHelper(r) {
  * Rd
  * Sw
  */
+//实现对Mod/RM字节解析
 static inline void decode_op_rm(vaddr_t *eip, Operand *rm, bool load_rm_val, Operand *reg, bool load_reg_val) {
   read_ModR_M(eip, rm, load_rm_val, reg, load_reg_val);
 }
@@ -180,7 +186,7 @@ make_DHelper(I) {
 }
 
 make_DHelper(r) {
-  decode_op_r(eip, id_dest, true);
+  decode_op_r(eip, id_dest, true);//读取寄存器信息到id_dest中，这里需要全局信息存储，因为后面的push指令会访问到
 }
 
 make_DHelper(E) {
@@ -260,10 +266,11 @@ make_DHelper(a2O) {
   decode_op_O(eip, id_dest, false);
 }
 
+//*Jump
 make_DHelper(J) {
-  decode_op_SI(eip, id_dest, false);
+  decode_op_SI(eip, id_dest, false);//将立即数值记录到操作数id_dest中，因为后面一条指令会记录decoding.jmp_eip，不需要再进行全局存储了，所以load_val=false
   // the target address can be computed in the decode stage
-  decoding.jmp_eip = id_dest->simm + *eip;
+  decoding.jmp_eip = id_dest->simm + *eip;//根据读取到的立即数值设置跳转地址
 }
 
 make_DHelper(push_SI) {
@@ -304,8 +311,9 @@ make_DHelper(out_a2dx) {
 #endif
 }
 
+//会根据第一个参数记录的类型的不同进行相应的写操作,包括写寄存器和写内存
 void operand_write(Operand *op, rtlreg_t* src) {
-  if (op->type == OP_TYPE_REG) { rtl_sr(op->reg, op->width, src); }
-  else if (op->type == OP_TYPE_MEM) { rtl_sm(&op->addr, op->width, src); }
+  if (op->type == OP_TYPE_REG) { rtl_sr(op->reg, op->width, src); }//写寄存器
+  else if (op->type == OP_TYPE_MEM) { rtl_sm(&op->addr, op->width, src); }//写内存
   else { assert(0); }
 }
