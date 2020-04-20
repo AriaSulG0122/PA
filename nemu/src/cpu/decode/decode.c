@@ -75,7 +75,7 @@ static inline make_DopHelper(a) {
 static inline make_DopHelper(r) {
   op->type = OP_TYPE_REG;
   op->reg = decoding.opcode & 0x7;//将opcode的末三位和0x111做与运算，找到对应的寄存器
-  if (load_val) {//如果需要读取信息，则进行全局读取
+  if (load_val) {//如果需要读取信息，则进行全局读取，将对应寄存器的内容读取到val中
     rtl_lr(&op->val, op->reg, op->width);
   }
 

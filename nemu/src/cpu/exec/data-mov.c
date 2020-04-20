@@ -7,15 +7,18 @@ make_EHelper(mov) {
 
 make_EHelper(push) {
   //TODO();
-  rtl_push(&id_dest->val);
+  rtl_push(&id_dest->val);//把value值push到栈顶
   print_asm_template1(push);
 }
 
 make_EHelper(pop) {
   //TODO();
-  rtl_pop(&t2);
+  rtl_pop(&id_dest->reg);
+  /* 调用rtl_pop()取出一个32位值到临时寄存器 */
+  //rtl_pop(&t2);
   //rtl_pop(&id_dest->val);
-  operand_write(id_dest,&t2);
+  /* 使用operand_write()将取出的临时值写入目标寄存器 */
+  //operand_write(id_dest,&t2);
   print_asm_template1(pop);
 }
 
