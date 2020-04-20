@@ -169,7 +169,7 @@ void difftest_step(uint32_t eip) {
     diff=true;
     printf("Different EDX!QEMU:0x%08x  NEMU:0x%08x\n",r.edx,cpu.edx);
   }
-  if(r.ecx!=cpu.ebx){
+  if(r.ebx!=cpu.ebx){
     diff=true;
     printf("Different EBX!QEMU:0x%08x  NEMU:0x%08x\n",r.ebx,cpu.ebx);
   }
