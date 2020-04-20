@@ -152,10 +152,47 @@ void difftest_step(uint32_t eip) {
 
   // TODO: Check the registers state with QEMU.
   // Set `diff` as `true` if they are not the same.
-  TODO();
+  //TODO();
+  if(r.eip!=cpu.eip){
+    diff=true;
+    printf("Different EIP!QEMU:0x%08x  NEMU:0x%08x\n",r.eip,cpu.eip);
+  }
+  if(r.eax!=cpu.eax){
+    diff=true;
+    printf("Different EAX!QEMU:0x%08x  NEMU:0x%08x\n",r.eax,cpu.eax);
+  }
+  if(r.ecx!=cpu.ecx){
+    diff=true;
+    printf("Different ECX!QEMU:0x%08x  NEMU:0x%08x\n",r.ecx,cpu.ecx);
+  }
+  if(r.edx!=cpu.edx){
+    diff=true;
+    printf("Different EDX!QEMU:0x%08x  NEMU:0x%08x\n",r.edx,cpu.edx);
+  }
+  if(r.ecx!=cpu.ebx){
+    diff=true;
+    printf("Different EBX!QEMU:0x%08x  NEMU:0x%08x\n",r.ebx,cpu.ebx);
+  }
+  if(r.esp!=cpu.esp){
+    diff=true;
+    printf("Different ESP!QEMU:0x%08x  NEMU:0x%08x\n",r.esp,cpu.esp);
+  }
+  if(r.ebp!=cpu.ebp){
+    diff=true;
+    printf("Different EBP!QEMU:0x%08x  NEMU:0x%08x\n",r.ebp,cpu.ebp);
+  }
+  if(r.esi!=cpu.esi){
+    diff=true;
+    printf("Different ESI!QEMU:0x%08x  NEMU:0x%08x\n",r.esi,cpu.esi);
+  }
+  if(r.edi!=cpu.edi){
+    diff=true;
+    printf("Different EDI!QEMU:0x%08x  NEMU:0x%08x\n",r.edi,cpu.edi);
+  }
 
   //如果检测到diff标志为true，就停止客户程序的运行
   if (diff) {
+    printf("EFLAGS:  QEMU:0x%08x  NEMU:0x%08x\n",r.eflags,cpu.eflags);
     nemu_state = NEMU_END;
   }
 }
