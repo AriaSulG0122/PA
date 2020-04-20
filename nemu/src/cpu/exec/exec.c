@@ -258,6 +258,7 @@ void exec_wrapper(bool print_flag) {
 
   update_eip();//更新eip
 
+//实现NEMU和QEMU的状态对比
 #ifdef DIFF_TEST
   void difftest_step(uint32_t);
   difftest_step(eip);

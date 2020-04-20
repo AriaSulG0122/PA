@@ -84,6 +84,8 @@ static inline void restart() {
   
   cpu.eip = ENTRY_START;//***initialize eip
   cpu.eflags=0x0000002;//为EFLAGS设置初始值
+
+//把QEMU的通用寄存器设置成和NEMU一样
 #ifdef DIFF_TEST
   init_qemu_reg();
 #endif
@@ -119,6 +121,7 @@ int  init_monitor(int argc, char *argv[]) {
   //***if not correct, it will trigger assertion fail.
   reg_test();
 
+//如果定义了DIFF_TEST(在include/common.h中)，那么在这里调用init_difftest函数来启动QEMU
 #ifdef DIFF_TEST
   /* Fork a child process to perform differential testing. */
   init_difftest();

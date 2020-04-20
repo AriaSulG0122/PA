@@ -63,6 +63,7 @@ static uint8_t mbr[] = {
   0x17, 0x00, 0x2c, 0x7c, 0x00, 0x00
 };
 
+//启动QEMU
 void init_difftest(void) {
   int ppid_before_fork = getpid();
   int pid = fork();
@@ -118,6 +119,7 @@ void init_difftest(void) {
   }
 }
 
+//把QEMU的通用寄存器设置成和NEMU一样
 void init_qemu_reg() {
   union gdb_regs r;
   gdb_getregs(&r);
@@ -126,6 +128,7 @@ void init_qemu_reg() {
   assert(ok == 1);
 }
 
+//进行状态对比
 void difftest_step(uint32_t eip) {
   union gdb_regs r;
   bool diff = false;
@@ -151,6 +154,7 @@ void difftest_step(uint32_t eip) {
   // Set `diff` as `true` if they are not the same.
   TODO();
 
+  //如果检测到diff标志为true，就停止客户程序的运行
   if (diff) {
     nemu_state = NEMU_END;
   }
