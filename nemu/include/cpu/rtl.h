@@ -147,7 +147,10 @@ static inline void rtl_not(rtlreg_t* dest) {
 //符号拓展
 static inline void rtl_sext(rtlreg_t* dest, const rtlreg_t* src1, int width) {
   // dest <- signext(src1[(width * 8 - 1) .. 0])
-  TODO();
+  //TODO();
+  rtl_li(&t2,32-width*8);
+  rtl_shl(dest,src1,&t2);
+  rtl_sar(dest,dest,&t2);
 }
 
 //pushl %eax  ==   subl $4,%esp + movl %eax,(%esp)
