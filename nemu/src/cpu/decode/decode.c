@@ -45,9 +45,9 @@ static inline make_DopHelper(SI) {
   //利用instr_fetch从eip开始读取op->width长度的指令，然后赋值给op->simm
   
   //op->simm=instr_fetch(eip,op->width);
-  t2 = instr_fetch(eip,op->width);
-  rtl_sext(&t2,&t2,op->width);//进行符号拓展
-  op->simm = t2;
+  t0 = instr_fetch(eip,op->width);
+  rtl_sext(&t0,&t0,op->width);//进行符号拓展
+  op->simm = t0;
   
   rtl_li(&op->val, op->simm);//将立即数值记录到op->val中
 
