@@ -18,5 +18,5 @@ make_EHelper(lea);//装载有效地址
 make_EHelper(sub); //减法
 //logic.c   
 make_EHelper(xor);//异或
-make_EHelper(and);
+make_EHelper(and);//与
 
