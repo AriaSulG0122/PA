@@ -15,8 +15,10 @@ Makefile.%: tests/%.c latest
 
 run: all
 
-clean: 
-	rm -rf Makefile.* build/
 rundummy:
 	make ARCH=x86-nemu ALL=dummy run
+
+clean: 
+	rm -rf Makefile.* build/
+
 latest:
