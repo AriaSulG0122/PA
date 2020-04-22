@@ -80,7 +80,7 @@ make_group(gp7,
 opcode_entry opcode_table [512] = {
   /* 0x00 */	EMPTY, EMPTY, IDEX(E2G,add),IDEX(E2G,add),
   /* 0x04 */	EMPTY, EMPTY, EMPTY, EMPTY,
-  /* 0x08 */	EMPTY, EMPTY, EMPTY, EMPTY,
+  /* 0x08 */	IDEX(G2E,or), IDEX(G2E,or), EMPTY, EMPTY,
   /* 0x0c */	EMPTY, EMPTY, EMPTY, EX(2byte_esc),
   /* 0x10 */	EMPTY, EMPTY, IDEX(E2G,adc), IDEX(E2G,adc),
   /* 0x14 */	EMPTY, EMPTY, EMPTY, EMPTY,

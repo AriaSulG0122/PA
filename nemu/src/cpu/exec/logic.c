@@ -29,8 +29,13 @@ make_EHelper(xor) {
 }
 
 make_EHelper(or) {
-  TODO();
-
+  //TODO();
+  rtl_or(&t2, &id_dest->val, &id_src->val);//利用rtl基本操作进行运算
+  operand_write(id_dest, &t2);//完成计算，写入结果
+  //更新各个标志位
+  rtl_update_ZFSF(&t2, id_dest->width);
+  rtl_set_OF(&tzero);
+  rtl_set_CF(&tzero);
   print_asm_template2(or);
 }
 
