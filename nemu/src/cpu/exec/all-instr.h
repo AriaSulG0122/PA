@@ -26,6 +26,7 @@ make_EHelper(xor);//异或
 make_EHelper(and);//与
 make_EHelper(or);//或
 make_EHelper(setcc);//Byte Set on condition
-make_EHelper(test);
+make_EHelper(test);//Logical Compare  
+make_EHelper(sar);//Shift Instructions
 //special.c
 make_EHelper(nop);//空指令
