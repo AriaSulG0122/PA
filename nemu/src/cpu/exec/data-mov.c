@@ -40,19 +40,18 @@ make_EHelper(leave) {
 }
 
 make_EHelper(cltd) {
-  if (decoding.is_operand_size_16) {//CWD instruction
+  if (decoding.is_operand_size_16) {//CWD instruction，DX:AX(sign-extend of AX)
     //TODO();
     rtl_msb(&t0,&cpu.eax,2);//获取16位数的最高位，看看是否<0，即获取AX的最高位
-    if(t0 == 1)cpu.edx = cpu.edx | 0xffff;//AX<0，则DX
+    if(t0 == 1)cpu.edx = cpu.edx | 0xffff;//AX<0，则以AX的符号位拓展DX
     else cpu.edx = 0;
   }
-  else {//CDQ instruction
+  else {//CDQ instruction,EDX:EAX(sign-extend of EAX)
     //TODO();
     rtl_msb(&t0,&cpu.eax,4);
     if(t0 == 1)cpu.edx = cpu.edx | 0xffffffff;
     else cpu.edx = 0;
   }
-
   print_asm(decoding.is_operand_size_16 ? "cwtl" : "cltd");
 }
 

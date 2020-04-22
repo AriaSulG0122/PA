@@ -27,6 +27,8 @@ make_EHelper(inc); //+1
 make_EHelper(dec); //-1
 make_EHelper(imul1);// imul with one operand
 make_EHelper(imul2);// imul with two operands
+make_EHelper(idiv);
+make_EHelper(div);
 //logic.c   
 make_EHelper(xor);//异或
 make_EHelper(and);//与
