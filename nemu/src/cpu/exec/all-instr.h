@@ -10,6 +10,7 @@ make_EHelper(nemu_trap);
 //control.c
 make_EHelper(call);//call为跳转控制类指令
 make_EHelper(ret);//过程回归
+make_EHelper(jcc);//Jump if Condition is met
 //data-mov.c
 make_EHelper(pop);//将某个值从栈顶取出
 make_EHelper(push);//将某个值放入到栈顶
