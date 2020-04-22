@@ -78,8 +78,8 @@ make_group(gp7,
 //全局译码表
 //每一个 opcode 对应相应指令的译码函数,执行函数,以及操作数宽度
 opcode_entry opcode_table [512] = {
-  /* 0x00 */	EMPTY, EMPTY, IDEX(E2G,add),IDEX(E2G,add),
-  /* 0x04 */	EMPTY, EMPTY, EMPTY, EMPTY,
+  /* 0x00 */	IDEXW(G2E,add,1), IDEX(G2E,add),IDEX(E2G,add),IDEX(E2G,add),
+  /* 0x04 */	IDEXW(I2a,add,1), IDEX(I2a,add),EMPTY, EMPTY,
   /* 0x08 */	IDEXW(G2E,or,1), IDEX(G2E,or), IDEXW(E2G,or,1), IDEX(E2G,or),
   /* 0x0c */	IDEXW(I2a,or,1), IDEX(I2a,or), EMPTY, EX(2byte_esc),
   /* 0x10 */	EMPTY, EMPTY, IDEX(E2G,adc), IDEX(E2G,adc),
