@@ -148,9 +148,9 @@ static inline void rtl_not(rtlreg_t* dest) {
 static inline void rtl_sext(rtlreg_t* dest, const rtlreg_t* src1, int width) {
   // dest <- signext(src1[(width * 8 - 1) .. 0])
   //TODO();
-  rtl_li(&t2,32-width*8);
-  rtl_shl(dest,src1,&t2);
-  rtl_sar(dest,dest,&t2);
+  rtl_li(&t2,32-width*8);//t2为多余位
+  rtl_shl(dest,src1,&t2);//dest为src1左移t2位
+  rtl_sar(dest,dest,&t2);//dest为dest右移t2位
 }
 
 //pushl %eax  ==   subl $4,%esp + movl %eax,(%esp)
