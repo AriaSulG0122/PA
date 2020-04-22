@@ -19,4 +19,5 @@ make_EHelper(sub); //减法
 //logic.c   
 make_EHelper(xor);//异或
 make_EHelper(and);//与
-
+//special.c
+make_EHelper(nop);//空指令
