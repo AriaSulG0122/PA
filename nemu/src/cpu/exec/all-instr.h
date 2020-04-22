@@ -17,6 +17,7 @@ make_EHelper(pop);//将某个值从栈顶取出
 make_EHelper(push);//将某个值放入到栈顶
 make_EHelper(lea);//装载有效地址
 make_EHelper(movzx);//Move with zero-extend
+make_EHelper(cltd);//Convert Word to Doubleword / Conver Doubleword to Quadword  
 //arith.c
 make_EHelper(sub); //减法
 make_EHelper(add); //加法

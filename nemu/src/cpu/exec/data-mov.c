@@ -40,10 +40,13 @@ make_EHelper(leave) {
 }
 
 make_EHelper(cltd) {
-  if (decoding.is_operand_size_16) {
-    TODO();
+  if (decoding.is_operand_size_16) {//CWD instruction
+    //TODO();
+    rtl_msb(&t0,&cpu.eax,2);//获取16位数的最高位，看看是否<0，即获取AX的最高位
+    if(t0 == 1)cpu.edx = cpu.edx | 0xffff;//AX<0，则DX
+    else cpu.edx = 0;
   }
-  else {
+  else {//CDQ instruction
     TODO();
   }
 
