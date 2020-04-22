@@ -78,7 +78,7 @@ make_group(gp7,
 //全局译码表
 //每一个 opcode 对应相应指令的译码函数,执行函数,以及操作数宽度
 opcode_entry opcode_table [512] = {
-  /* 0x00 */	EMPTY, EMPTY, IDEX(E2G,add), EMPTY,
+  /* 0x00 */	EMPTY, EMPTY, IDEX(E2G,add),IDEX(E2G,add),
   /* 0x04 */	EMPTY, EMPTY, EMPTY, EMPTY,
   /* 0x08 */	EMPTY, EMPTY, EMPTY, EMPTY,
   /* 0x0c */	EMPTY, EMPTY, EMPTY, EX(2byte_esc),
