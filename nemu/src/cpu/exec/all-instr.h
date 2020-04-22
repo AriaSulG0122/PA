@@ -16,7 +16,8 @@ make_EHelper(jmp);//跳转
 make_EHelper(pop);//将某个值从栈顶取出
 make_EHelper(push);//将某个值放入到栈顶
 make_EHelper(lea);//装载有效地址
-make_EHelper(movzx);//Move with zero-extend
+make_EHelper(movzx);//Move with Zero-Extend
+make_EHelper(movsx);//Move with Sign-Extend
 make_EHelper(cltd);//Convert Word to Doubleword / Conver Doubleword to Quadword  
 //arith.c
 make_EHelper(sub); //减法
@@ -27,8 +28,8 @@ make_EHelper(inc); //+1
 make_EHelper(dec); //-1
 make_EHelper(imul1);// imul with one operand
 make_EHelper(imul2);// imul with two operands
-make_EHelper(idiv);
-make_EHelper(div);
+make_EHelper(idiv);//Unsigned divide
+make_EHelper(div);//Signed Divide
 //logic.c   
 make_EHelper(xor);//异或
 make_EHelper(and);//与
