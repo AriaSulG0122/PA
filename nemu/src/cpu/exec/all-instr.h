@@ -17,6 +17,7 @@ make_EHelper(lea);//装载有效地址
 //arith.c
 make_EHelper(sub); //减法
 make_EHelper(add); //加法
+make_EHelper(adc); //带CF加法
 //logic.c   
 make_EHelper(xor);//异或
 make_EHelper(and);//与
