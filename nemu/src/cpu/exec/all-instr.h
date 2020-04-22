@@ -21,6 +21,8 @@ make_EHelper(sub); //减法
 make_EHelper(add); //加法
 make_EHelper(adc); //带CF加法
 make_EHelper(cmp); //Compare Two Operand  
+make_EHelper(inc); //+1
+make_EHelper(dec); //-1
 //logic.c   
 make_EHelper(xor);//异或
 make_EHelper(and);//与
