@@ -27,6 +27,7 @@ make_EHelper(dec); //-1
 make_EHelper(xor);//异或
 make_EHelper(and);//与
 make_EHelper(or);//或
+make_EHelper(not);//非
 make_EHelper(setcc);//Byte Set on condition
 make_EHelper(test);//Logical Compare  
 make_EHelper(sar);//Shift Right with extension
