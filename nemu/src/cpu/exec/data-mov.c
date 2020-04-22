@@ -47,7 +47,10 @@ make_EHelper(cltd) {
     else cpu.edx = 0;
   }
   else {//CDQ instruction
-    TODO();
+    //TODO();
+    rtl_msb(&t0,&cpu.eax,4);
+    if(t0 == 1)cpu.edx = cpu.edx | 0xffffffff;
+    else cpu.edx = 0;
   }
 
   print_asm(decoding.is_operand_size_16 ? "cwtl" : "cltd");
