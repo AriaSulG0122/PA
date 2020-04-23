@@ -43,5 +43,6 @@ make_EHelper(setcc);//Byte Set on condition
 make_EHelper(test);//Logical Compare  
 make_EHelper(sar);//Shift Right with extension
 make_EHelper(shl);//Shift Left
+make_EHelper(shr);//Shift right
 //special.c
 make_EHelper(nop);//空指令
