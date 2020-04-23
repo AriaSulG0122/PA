@@ -28,8 +28,9 @@ make_EHelper(adc); //带CF加法
 make_EHelper(cmp); //Compare Two Operand  
 make_EHelper(inc); //+1
 make_EHelper(dec); //-1
-make_EHelper(imul1);// imul with one operand
-make_EHelper(imul2);// imul with two operands
+make_EHelper(mul); // Unsigned multiplication of AL or AX
+make_EHelper(imul1);// Signed multiply, imul with one operand
+make_EHelper(imul2);// Signed multiply, imul with two operands
 make_EHelper(idiv);//Unsigned divide
 make_EHelper(div);//Signed Divide
 //logic.c   
