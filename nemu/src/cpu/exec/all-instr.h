@@ -24,6 +24,7 @@ make_EHelper(cltd);//Convert Word to Doubleword / Conver Doubleword to Quadword
 make_EHelper(leave);//Hign Level Procedure Exit  
 //arith.c
 make_EHelper(sub); //减法
+make_EHelper(sbb); //Interger Subtraction with Borrow
 make_EHelper(add); //加法
 make_EHelper(adc); //带CF加法
 make_EHelper(cmp); //Compare Two Operand  
