@@ -39,8 +39,11 @@ make_EHelper(ret) {
   print_asm("ret");
 }
 
+//参考jmp_rm和call
 make_EHelper(call_rm) {
-  TODO();
-
+  //TODO();
+  decoding.is_jmp=1;//This is jump instruction
+  rtl_push(eip);
+  decoding.jmp_eip = id_dest->val;
   print_asm("call *%s", id_dest->str);
 }

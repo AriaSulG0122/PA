@@ -9,10 +9,11 @@ make_EHelper(nemu_trap);
 
 //control.c
 make_EHelper(call);//call为跳转控制类指令
+make_EHelper(call_rm);//基于数值的跳转
 make_EHelper(ret);//过程回归
 make_EHelper(jcc);//Jump if Condition is met
 make_EHelper(jmp);//基于当前指令的立即数偏移的跳转
-make_EHelper(jmp_rm);//基于
+make_EHelper(jmp_rm);//基于数值的跳转
 //data-mov.c
 make_EHelper(pop);//将某个值从栈顶取出
 make_EHelper(push);//将某个值放入到栈顶

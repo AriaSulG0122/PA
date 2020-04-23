@@ -194,7 +194,7 @@ make_DHelper(r) {
 }
 
 make_DHelper(E) {
-  decode_op_rm(eip, id_dest, true, NULL, false);
+  decode_op_rm(eip, id_dest, true, NULL, false);//将值载入id_dest
 }
 
 make_DHelper(gp7_E) {
