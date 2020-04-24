@@ -6,13 +6,13 @@ static unsigned long boot_time;
 
 //用于进行IOE相关的初始化操作，调用后程序才能正常使用上述IOE相关的API
 void _ioe_init() {
-  boot_time = inl(RTC_PORT);
+  boot_time = inl(RTC_PORT);//inl(RTC_PORT)记录了当前时间
 }
 
 //返回系统启动后经过的毫秒数
 unsigned long _uptime() {
-  return 0;
-  //return inl(RTC_PORT)-boot_time;//毫秒数就是当前时间和建立时间的差值
+  //return 0;
+  return inl(RTC_PORT)-boot_time;//毫秒数就是当前时间和启动时间的差值
 }
 
 uint32_t* const fb = (uint32_t *)0x40000;
