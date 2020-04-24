@@ -56,12 +56,16 @@ make_EHelper(cltd) {
   print_asm(decoding.is_operand_size_16 ? "cwtl" : "cltd");
 }
 
-make_EHelper(cwtl) {
-  if (decoding.is_operand_size_16) {
-    TODO();
+make_EHelper(cwtl) {//Convert Byte to Word/Convert Word to Doubleword
+  if (decoding.is_operand_size_16) {//AX<-SignExtend(AL),Convert Byte to Word
+    //TODO();
+    rtl_sext(&t0,&cpu.eax,1);//进行符号拓展
+    cpu.eax = (cpu.eax & 0xffff0000) | (t0 & 0xffff);
   }
-  else {
-    TODO();
+  else {//EAX<-SignExtend(AX),Convert Word to Doubleword
+    //TODO();
+    rtl_sext(&t0,&cpu.eax,2);
+    cpu.eax = t0;
   }
 
   print_asm(decoding.is_operand_size_16 ? "cbtw" : "cwtl");

@@ -21,6 +21,7 @@ make_EHelper(lea);//装载有效地址
 make_EHelper(movzx);//Move with Zero-Extend
 make_EHelper(movsx);//Move with Sign-Extend
 make_EHelper(cltd);//Convert Word to Doubleword / Conver Doubleword to Quadword  
+make_EHelper(cwtl);//Convert Byte to Word/Convert Word to Doubleword
 make_EHelper(leave);//Hign Level Procedure Exit  
 //arith.c
 make_EHelper(sub); //减法
