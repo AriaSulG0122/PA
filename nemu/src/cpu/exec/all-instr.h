@@ -48,5 +48,5 @@ make_EHelper(shr);//Shift right
 //special.c
 make_EHelper(nop);//空指令
 //system.c
-make_EHelper(in);//输入
-make_EHelper(out);//输出
+make_EHelper(in);//Input from port
+make_EHelper(out);//Output to port

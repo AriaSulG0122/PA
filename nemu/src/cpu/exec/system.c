@@ -44,7 +44,7 @@ make_EHelper(iret) {
 uint32_t pio_read(ioaddr_t, int);
 void pio_write(ioaddr_t, int, uint32_t);
 
-make_EHelper(in) {
+make_EHelper(in) {//DEST<-[SRC](Reads from I/O address space),来自手册
   //TODO();
   t0=pio_read(id_src->val,id_dest->width);
   operand_write(id_dest,&t0);
@@ -55,7 +55,7 @@ make_EHelper(in) {
 #endif
 }
 
-make_EHelper(out) {
+make_EHelper(out) {//[DEST]<-SRC(I/O address space used),来自手册
   //TODO();
   pio_write(id_dest->val,id_dest->width,id_src->val);
   print_asm_template2(out);
