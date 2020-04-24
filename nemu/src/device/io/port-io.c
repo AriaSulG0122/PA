@@ -41,7 +41,7 @@ void* add_pio_map(ioaddr_t addr, int len, pio_callback_t callback) {
 
 
 /* CPU interface */
-//面向CPU的端口I/O读接口
+//面向CPU的端口I/O读接口，从地址addr读取len字节长度
 uint32_t pio_read(ioaddr_t addr, int len) {
   assert(len == 1 || len == 2 || len == 4);
   assert(addr + len - 1 < PORT_IO_SPACE_MAX);
@@ -50,7 +50,7 @@ uint32_t pio_read(ioaddr_t addr, int len) {
   return data;
 }
 
-//面向CPU的端口I/O写接口
+//面向CPU的端口I/O写接口，从地址addr写入len长度的数据data
 void pio_write(ioaddr_t addr, int len, uint32_t data) {
   assert(len == 1 || len == 2 || len == 4);
   assert(addr + len - 1 < PORT_IO_SPACE_MAX);
