@@ -43,7 +43,7 @@ void _draw_sync() {
 //返回按键的键盘码，若无按键，则返回_KEY_NONE
 int _read_key() {
   uint32_t keyCode=_KEY_NONE;
-  if(inl(0x64)==1){//状态寄存器生效
+  if(inl(0x64)&0x1){//状态寄存器生效
     keyCode=inl(0x60);
   }
   return keyCode;
