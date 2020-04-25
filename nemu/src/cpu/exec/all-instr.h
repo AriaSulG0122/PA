@@ -36,6 +36,7 @@ make_EHelper(imul1);// Signed multiply, imul with one operand
 make_EHelper(imul2);// Signed multiply, imul with two operands
 make_EHelper(idiv);//Unsigned divide
 make_EHelper(div);//Signed Divide
+make_EHelper(neg);//Two's Complement Negation
 //logic.c   
 make_EHelper(xor);//异或
 make_EHelper(and);//与
