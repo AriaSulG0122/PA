@@ -88,3 +88,13 @@ make_EHelper(not) {
   operand_write(id_dest,&t2);
   print_asm_template1(not);
 }
+
+//原框架中没有该指令，自己添加
+make_EHelper(rol) {
+  rtl_shl(&t2,&id_dest->val,&id_src->val);//左移n
+  rtl_shri(&t2,&id_dest->val,id_dest->width*8-id_src->val);//对于最左边的位，左移n相当于右移width-n
+  rtl_or(&t2,&t2,&t3);
+  operand_write(id_dest, &t2);
+
+  print_asm_template2(rol);
+}
