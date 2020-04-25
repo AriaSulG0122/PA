@@ -27,13 +27,13 @@ extern void* memcpy(void *, const void *, int);
 
 //用于将pixels指定的矩形像素绘制到屏幕中以(x,y)和(x+w,y+h)两点连线为对角线的矩形区域
 void _draw_rect(const uint32_t *pixels, int x, int y, int w, int h) {
-  int i;
-  for (i = 0; i < _screen.width * _screen.height; i++) {
-    fb[i] = pixels[i];
-  }
   // int i;
-  // for(i=0;i<h;i++)
-  //     memcpy(fb+(y+i)*_screen.width+x, pixels+i*w, w*4);
+  // for (i = 0; i < _screen.width * _screen.height; i++) {
+  //   fb[i] = i;
+  // }
+  int i;
+  for(i=0;i<h;i++)
+      memcpy(fb+(y+i)*_screen.width+x, pixels+i*w, w*4);
 }
 
 //用于将之前的绘制内容同步到屏幕上（在NEMU中绘制内容总是会同步到屏幕上，因而无需实现此API）
