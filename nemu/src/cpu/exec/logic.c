@@ -96,6 +96,7 @@ make_EHelper(rol) {
   rtl_or(&t0,&t1,&t0);
   operand_write(id_dest, &t0);
 
+  //注意，下面的部分按照手册P372来
   rtl_get_CF(&t2);//得到CF位
   t0 = id_src->val; //count
   if(t0 == 1)
@@ -109,6 +110,5 @@ make_EHelper(rol) {
           rtl_set_OF(&tzero);
       }
   }
-
   print_asm_template2(rol);
 }

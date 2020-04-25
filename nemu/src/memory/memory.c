@@ -13,12 +13,21 @@ uint8_t pmem[PMEM_SIZE];
 
 //***Get the last 8|16|24|32 bits of pmem_rw(addr,uint32_t)
 uint32_t paddr_read(paddr_t addr, int len) {
-  return pmem_rw(addr, uint32_t) & (~0u >> ((4 - len) << 3));
+  if(is_mmio(addr)==-1){//为-1，则不是内存映射I/O的访问
+    return pmem_rw(addr, uint32_t) & (~0u >> ((4 - len) << 3));
+  }else{
+    return mmio_read(addr,len,is_mmio(addr));//根据映射号访问内存映射I/O
+  }
   //***(4-len)<<3 = (4-len)*2^3,     ~ = take inverse
 }
 
 void paddr_write(paddr_t addr, int len, uint32_t data) {
-  memcpy(guest_to_host(addr), &data, len);
+  if(is_mmio(addr)==-1){
+    memcpy(guest_to_host(addr), &data, len);
+  }else{
+    mmio_write(addr,len,data,is_mmio(addr));
+  }
+  
 }
 // ***x86 is small end.
 uint32_t vaddr_read(vaddr_t addr, int len) {

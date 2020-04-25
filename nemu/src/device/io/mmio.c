@@ -35,6 +35,7 @@ void* add_mmio_map(paddr_t addr, int len, mmio_callback_t callback) {
 
 /* bus interface */
 //设备在初始化时调用该函数来注册一个内存I/O映射关系，返回该映射关系的I/O映射空间首地址
+//判断一个物理地址是否被映射到I/O空间，如果是，则返回映射号，否则返回-1
 int is_mmio(paddr_t addr) {
   int i;
   for (i = 0; i < nr_map; i ++) {
