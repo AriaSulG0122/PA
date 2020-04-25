@@ -91,10 +91,24 @@ make_EHelper(not) {
 
 //原框架中没有该指令，自己添加
 make_EHelper(rol) {
-  rtl_shl(&t2,&id_dest->val,&id_src->val);//左移n
-  rtl_shri(&t2,&id_dest->val,id_dest->width*8-id_src->val);//对于最左边的位，左移n相当于右移width-n
-  rtl_or(&t2,&t2,&t3);
-  operand_write(id_dest, &t2);
+  rtl_shl(&t0,&id_dest->val,&id_src->val);//左移n
+  rtl_shri(&t1,&id_dest->val,id_dest->width*8-id_src->val);//对于最左边的位，左移n相当于右移width-n
+  rtl_or(&t0,&t1,&t0);
+  operand_write(id_dest, &t0);
+
+  rtl_get_CF(&t2);//得到CF位
+  t0 = id_src->val; //count
+  if(t0 == 1)
+  {
+      rtl_msb(&t1,&id_dest->val,id_dest->width);//Get high-order bit of r/m
+      if(t2!=t1)
+      {
+          rtl_set_OF(&t0);
+      }
+      else{
+          rtl_set_OF(&tzero);
+      }
+  }
 
   print_asm_template2(rol);
 }
