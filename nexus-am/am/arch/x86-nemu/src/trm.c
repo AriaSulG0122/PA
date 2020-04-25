@@ -2,12 +2,12 @@
 #include <x86.h>
 
 // Define this macro after serial has been implemented
-//#define HAS_SERIAL
+#define HAS_SERIAL
 
 #define SERIAL_PORT 0x3f8
 
-extern char _heap_start;
-extern char _heap_end;
+extern char _heap_start;//堆区头
+extern char _heap_end;//堆区尾
 extern int main();
 
 _Area _heap = {
@@ -26,21 +26,21 @@ static void serial_init() {
   outb(SERIAL_PORT + 4, 0x0B);
 #endif
 }
-
+//输出一个字符
 void _putc(char ch) {
 #ifdef HAS_SERIAL
   while ((inb(SERIAL_PORT + 5) & 0x20) == 0);
   outb(SERIAL_PORT, ch);
 #endif
 }
-
+//结束程序的运行
 void _halt(int code) {
   asm volatile(".byte 0xd6" : :"a"(code));
 
   // should not reach here
   while (1);
 }
-
+//进行TRM相关的初始化工作
 void _trm_init() {
   serial_init();
   int ret = main();

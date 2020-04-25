@@ -44,19 +44,20 @@ make_EHelper(iret) {
 uint32_t pio_read(ioaddr_t, int);
 void pio_write(ioaddr_t, int, uint32_t);
 
-make_EHelper(in) {
-  TODO();
-
+make_EHelper(in) {//DEST<-[SRC](Reads from I/O address space),来自手册
+  //TODO();
+  t0=pio_read(id_src->val,id_dest->width);
+  operand_write(id_dest,&t0);
   print_asm_template2(in);
 
 #ifdef DIFF_TEST
-  diff_test_skip_qemu();
+  diff_test_skip_qemu();//跳过与QEMU的检查
 #endif
 }
 
-make_EHelper(out) {
-  TODO();
-
+make_EHelper(out) {//[DEST]<-SRC(I/O address space used),来自手册
+  //TODO();
+  pio_write(id_dest->val,id_dest->width,id_src->val);
   print_asm_template2(out);
 
 #ifdef DIFF_TEST

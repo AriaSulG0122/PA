@@ -43,8 +43,12 @@ static inline make_DopHelper(SI) {
    */
   //TODO();
   //利用instr_fetch从eip开始读取op->width长度的指令，然后赋值给op->simm
-  op->simm=instr_fetch(eip,op->width);
-
+  
+  //op->simm=instr_fetch(eip,op->width);
+  t0 = instr_fetch(eip,op->width);
+  rtl_sext(&t0,&t0,op->width);//进行符号拓展
+  op->simm = t0;
+  
   rtl_li(&op->val, op->simm);//将立即数值记录到op->val中
 
 #ifdef DEBUG
@@ -75,7 +79,7 @@ static inline make_DopHelper(a) {
 static inline make_DopHelper(r) {
   op->type = OP_TYPE_REG;
   op->reg = decoding.opcode & 0x7;//将opcode的末三位和0x111做与运算，找到对应的寄存器
-  if (load_val) {//如果需要读取信息，则进行全局读取
+  if (load_val) {//如果需要读取信息，则进行全局读取，将对应寄存器的内容读取到val中
     rtl_lr(&op->val, op->reg, op->width);
   }
 
@@ -190,7 +194,7 @@ make_DHelper(r) {
 }
 
 make_DHelper(E) {
-  decode_op_rm(eip, id_dest, true, NULL, false);
+  decode_op_rm(eip, id_dest, true, NULL, false);//将值载入id_dest
 }
 
 make_DHelper(gp7_E) {

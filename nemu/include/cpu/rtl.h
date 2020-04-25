@@ -137,17 +137,23 @@ make_rtl_setget_eflags(SF)
 //数据移动
 static inline void rtl_mv(rtlreg_t* dest, const rtlreg_t *src1) {
   // dest <- src1
-  TODO();
+  //TODO();
+  *dest = *src1;
 }
 
+//非
 static inline void rtl_not(rtlreg_t* dest) {
   // dest <- ~dest
-  TODO();
+  //TODO();
+  *dest = ~(*dest);
 }
 //符号拓展
 static inline void rtl_sext(rtlreg_t* dest, const rtlreg_t* src1, int width) {
   // dest <- signext(src1[(width * 8 - 1) .. 0])
-  TODO();
+  //TODO();
+  rtl_li(&t3,32-width*8);//t2为多余位
+  rtl_shl(dest,src1,&t3);//dest为src1左移t2位
+  rtl_sar(dest,dest,&t3);//dest为dest右移t2位
 }
 
 //pushl %eax  ==   subl $4,%esp + movl %eax,(%esp)

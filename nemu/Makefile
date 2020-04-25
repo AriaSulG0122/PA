@@ -52,3 +52,10 @@ gdb: $(BINARY)
 
 clean: 
 	rm -rf $(BUILD_DIR)
+count: 
+	git checkout pa0
+	find . -name "*.[ch]" |xargs cat|wc -l
+	git checkout pa1
+	find . -name "*.[ch]" |xargs cat|wc -l
+	git checkout pa2
+	find . -name "*.[ch]" |xargs cat|wc -l

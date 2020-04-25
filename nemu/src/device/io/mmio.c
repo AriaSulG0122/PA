@@ -7,6 +7,7 @@
 static uint8_t mmio_space_pool[MMIO_SPACE_MAX];
 static uint32_t mmio_space_free_index = 0;
 
+//记录一个内存I/O映射的关系
 typedef struct {
   paddr_t low;
   paddr_t high;
@@ -33,6 +34,8 @@ void* add_mmio_map(paddr_t addr, int len, mmio_callback_t callback) {
 }
 
 /* bus interface */
+//设备在初始化时调用该函数来注册一个内存I/O映射关系，返回该映射关系的I/O映射空间首地址
+//判断一个物理地址是否被映射到I/O空间，如果是，则返回映射号，否则返回-1
 int is_mmio(paddr_t addr) {
   int i;
   for (i = 0; i < nr_map; i ++) {
@@ -43,6 +46,7 @@ int is_mmio(paddr_t addr) {
   return -1;
 }
 
+//面向CPU的内存I/O读接口
 uint32_t mmio_read(paddr_t addr, int len, int map_NO) {
   assert(len >= 1 && len <= 4);
   MMIO_t *map = &maps[map_NO];
@@ -52,6 +56,7 @@ uint32_t mmio_read(paddr_t addr, int len, int map_NO) {
   return data;
 }
 
+//面向CPU的内存I/O写接口
 void mmio_write(paddr_t addr, int len, uint32_t data, int map_NO) {
   assert(len >= 1 && len <= 4);
   MMIO_t *map = &maps[map_NO];
