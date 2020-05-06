@@ -12,7 +12,7 @@ extern size_t ramdisk_write(const void *buf, size_t offset, size_t len);
 extern size_t get_ramdisk_size();
 
 uintptr_t loader(_Protect *as, const char *filename) {
-  //TODO();
-  ramdisk_read(DEFAULT_ENTRY,0,get_ramdisk_size());
+  TODO();
+  //ramdisk_read(DEFAULT_ENTRY,0,get_ramdisk_size());
   return (uintptr_t)DEFAULT_ENTRY;
 }
