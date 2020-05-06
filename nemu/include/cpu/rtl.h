@@ -148,7 +148,7 @@ static inline void rtl_not(rtlreg_t* dest) {
   *dest = ~(*dest);
 }
 //符号拓展
-void rtl_sext(rtlreg_t* dest, const rtlreg_t* src1, int width) {
+static inline void rtl_sext(rtlreg_t* dest, const rtlreg_t* src1, int width) {
   // dest <- signext(src1[(width * 8 - 1) .. 0])
   //TODO();
   rtl_li(&t3,32-width*8);//t2为多余位
