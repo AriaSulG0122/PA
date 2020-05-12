@@ -7,7 +7,7 @@
 //最后的效果就是make_EHelper(name) 等效于函数 void exec_[name] (vaddr_t *eip)
 #define make_EHelper(name) void concat(exec_, name) (vaddr_t *eip)
 typedef void (*EHelper) (vaddr_t *);//typedef为复杂的声明定义了一个简单的别名，为EHelper
-
+void raise_intr(uint8_t NO, vaddr_t ret_addr);
 #include "cpu/decode.h"
     
 //读取指令的len字节长度，然后eip前进len字节
