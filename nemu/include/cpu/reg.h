@@ -39,7 +39,7 @@ typedef struct {
       rtlreg_t eax, ecx, edx, ebx, esp, ebp, esi, edi;
     };
   };
-
+  
   vaddr_t eip;
 
   //说明EFLAGS Register结构
@@ -60,6 +60,11 @@ typedef struct {
     uint32_t eflags;
   };
 
+  struct{
+    uint32_t base;
+    uint16_t limit;
+  }idtr;//IDTR寄存器，存放IDT的首地址和长度
+  uint16_t CS;//代码段寄存器，里面包含CPL(Current Previlege Level)信息
 } CPU_state;
 extern CPU_state cpu;
 

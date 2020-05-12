@@ -53,3 +53,5 @@ make_EHelper(nop);//空指令
 //system.c
 make_EHelper(in);//Input from port
 make_EHelper(out);//Output to port
+make_EHelper(lidt);//Interrput Descriptor Table Register
+make_EHelper(int);//Call to Interrupt Procedure

@@ -25,7 +25,7 @@ void init_ramdisk() {
   Log("ramdisk info: start = %p, end = %p, size = %d bytes",
       &ramdisk_start, &ramdisk_end, RAMDISK_SIZE);
 }
-
+//返回ramdisk的大小，单位为字节
 size_t get_ramdisk_size() {
   return RAMDISK_SIZE;
 }

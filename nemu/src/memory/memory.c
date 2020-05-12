@@ -27,7 +27,6 @@ void paddr_write(paddr_t addr, int len, uint32_t data) {
   }else{
     mmio_write(addr,len,data,is_mmio(addr));
   }
-  
 }
 // ***x86 is small end.
 uint32_t vaddr_read(vaddr_t addr, int len) {
