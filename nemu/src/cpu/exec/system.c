@@ -3,9 +3,16 @@
 void diff_test_skip_qemu();
 void diff_test_skip_nemu();
 
+//在IDTR寄存器中设置IDT的首地址和长度
 make_EHelper(lidt) {
-  TODO();
-
+  //TODO();
+  cpu.idtr.limit=vaddr_read(id_dest->addr,2);
+  if(decoding.is_operand_size_16){
+    cpu.idtr.base=vaddr_read(id_dest->addr+2,3);
+  }
+  else{
+    cpu.idtr.base=vaddr_read(id_dest->addr+2,4);
+  }
   print_asm_template1(lidt);
 }
 
@@ -26,8 +33,8 @@ make_EHelper(mov_cr2r) {
 }
 
 make_EHelper(int) {
-  TODO();
-
+  //TODO();
+  raise_intr(id_dest->val,decoding.seq_eip);
   print_asm("int %s", id_dest->str);
 
 #ifdef DIFF_TEST
