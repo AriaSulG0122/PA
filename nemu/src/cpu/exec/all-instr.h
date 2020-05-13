@@ -17,6 +17,7 @@ make_EHelper(jmp_rm);//基于数值的跳转
 //data-mov.c
 make_EHelper(pop);//将某个值从栈顶取出
 make_EHelper(push);//将某个值放入到栈顶
+make_EHelper(pusha);//Push All General Registers
 make_EHelper(lea);//装载有效地址
 make_EHelper(movzx);//Move with Zero-Extend
 make_EHelper(movsx);//Move with Sign-Extend
