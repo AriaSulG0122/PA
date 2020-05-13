@@ -18,6 +18,7 @@ make_EHelper(jmp_rm);//基于数值的跳转
 make_EHelper(pop);//将某个值从栈顶取出
 make_EHelper(push);//将某个值放入到栈顶
 make_EHelper(pusha);//Push All General Registers
+make_EHelper(popa);//Pop all General Registers
 make_EHelper(lea);//装载有效地址
 make_EHelper(movzx);//Move with Zero-Extend
 make_EHelper(movsx);//Move with Sign-Extend
@@ -56,3 +57,4 @@ make_EHelper(in);//Input from port
 make_EHelper(out);//Output to port
 make_EHelper(lidt);//Interrput Descriptor Table Register
 make_EHelper(int);//Call to Interrupt Procedure
+make_EHelper(iret);//Interrupt Return
