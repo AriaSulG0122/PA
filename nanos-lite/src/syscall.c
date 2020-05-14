@@ -7,6 +7,7 @@ static inline _RegSet* sys_write(_RegSet *r){
   int len=(int)SYSCALL_ARG4(r);
   if(fd==1||fd==2){//stdout或stderr
     for(int i=0;i<len;i++){
+      Log("fd:%d,len:%d",fd,len);
       //将buf为首地址的len字节输出到串口
       _putc(buf[i]);
     }
