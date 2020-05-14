@@ -30,8 +30,18 @@ int _write(int fd, void *buf, size_t count){
    _syscall_(SYS_write, fd, (uintptr_t)buf, count);
 }
 
+extern char _end;
+static intptr_t brk = (intptr_t)&_end;
 void *_sbrk(intptr_t increment){
-  return (void *)-1;
+  intptr_t oldvalue=program_break;
+  int test=_syscall_(SYS_brk,oldvalue+increment,0,0);
+  if(test==0){
+    program_break+=increment;
+    return (void *)oldvalue;
+  }
+  else return (void *) -1;
+  //若该系统调用失败，_sbrk()会返回-1
+  //return (void *)-1;
 }
 
 int _read(int fd, void *buf, size_t count) {
