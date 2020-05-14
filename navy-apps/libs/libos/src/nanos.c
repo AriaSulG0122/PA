@@ -10,7 +10,7 @@
 #ifndef __ISA_NATIVE__
 
 // FIXME: this is temporary
-
+//内联汇编会先把系统调用的参数依次放入%eax,%ebx,%ecx,%edx四个寄存器中，然后执行int$0x80手动触发一个特殊的异常
 int _syscall_(int type, uintptr_t a0, uintptr_t a1, uintptr_t a2){
   int ret = -1;
   asm volatile("int $0x80": "=a"(ret): "a"(type), "b"(a0), "c"(a1), "d"(a2));
@@ -26,7 +26,8 @@ int _open(const char *path, int flags, mode_t mode) {
 }
 
 int _write(int fd, void *buf, size_t count){
-  _exit(SYS_write);
+  //_exit(SYS_write);
+   _syscall_(SYS_write, fd, (uintptr_t)buf, count);
 }
 
 void *_sbrk(intptr_t increment){
