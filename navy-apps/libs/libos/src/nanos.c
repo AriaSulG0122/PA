@@ -31,7 +31,8 @@ int _write(int fd, void *buf, size_t count){
 }
 
 extern char _end;
-static intptr_t brk = (intptr_t)&_end;
+//program_break一开始的位置位于_end
+static intptr_t program_break = (intptr_t)&_end;
 void *_sbrk(intptr_t increment){
   intptr_t oldvalue=program_break;
   int test=_syscall_(SYS_brk,oldvalue+increment,0,0);
