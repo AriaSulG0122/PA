@@ -70,7 +70,7 @@ int fs_close(int fd){
 //写入文件
 ssize_t fs_write(int fd,const void *buf,size_t len){
   ssize_t fs_size=fs_filesz(fd);
-  printf("len:%d\n",len);
+  printf("len:%d,size:%d,openoffset:%d\n",len,fs_size,file_table[fd].open_offset);
   //处理越界
   if(file_table[fd].open_offset>fs_size){
     return 0;
