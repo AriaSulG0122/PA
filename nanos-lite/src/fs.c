@@ -33,11 +33,11 @@ static Finfo file_table[] __attribute__((used)) = {
 void init_fs() {
   // TODO: initialize the size of /dev/fb
 }
-
+//返回一个文件的大小
 size_t fs_filesz(int fd){
   return file_table[fd].size;
 }
-
+//打开文件并返回fd
 int fs_open(const char *pathname,int flags,int mode){
   for(int i=0;i<NR_FILES;i++){
     if(strcmp(file_table[i].name,pathname)==0){
@@ -47,7 +47,7 @@ int fs_open(const char *pathname,int flags,int mode){
   assert(0);//没找到目标文件，则报错
   return -1;
 }
-
+//读取文件
 ssize_t fs_read(int fd,void *buf,size_t len){
   ssize_t fs_size=fs_filesz(fd);
   if((file_table[fd].open_offset + len)>fs_size||len==0){//读取越界
@@ -57,8 +57,13 @@ ssize_t fs_read(int fd,void *buf,size_t len){
   file_table[fd].open_offset+=len;
   return len;
 }
+//关闭文件
+int fs_close(int fd){
+  return 0;//直接返回0，表示总是关闭成功
+}
 
 
+//写入文件
 ssize_t fs_write(int fd,const void *buf,size_t len){
   ssize_t fs_size=fs_filesz(fd);
   if((file_table[fd].open_offset + len)>fs_size||len==0){//写入越界
@@ -68,8 +73,26 @@ ssize_t fs_write(int fd,const void *buf,size_t len){
   file_table[fd].open_offset+=len;
   return len;
 }
-
-int fs_close(int fd){
-  return 0;//直接返回0，表示总是关闭成功
+//调整偏移量
+off_t fs_lseek(int fd,off_t offset,int whence){
+  off_t result=-1;//默认-1，为错误返回值
+  switch(whence){
+    case SEEK_SET://直接重设偏移
+      if(offset>=0 && offset<=file_table[fd].size){
+        file_table[fd].open_offset=offset;
+        result=file_table[fd].open_offset;
+      }
+      break;
+    case SEEK_CUR://原偏移基础上新增偏移
+      if( (offset+file_table[fd].open_offset)>=0 && (offset+file_table[fd].open_offset)<=file_table[fd].size){
+        file_table[fd].open_offset+=offset;
+        result=file_table[fd].open_offset;
+      }
+      break;
+    case SEEK_END://文件末尾基础上新增偏移
+      file_table[fd].open_offset=file_table[fd].size+offset;
+      result=file_table[fd].open_offset;
+  }
+  return result;
 }
 
