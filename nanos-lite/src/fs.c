@@ -51,6 +51,7 @@ int fs_open(const char *pathname,int flags,int mode){
 //读取文件
 ssize_t fs_read(int fd,void *buf,size_t len){
   ssize_t fs_size=fs_filesz(fd);
+   printf("Read:  len:%d,size:%d,openoffset:%d\n",len,fs_size,file_table[fd].open_offset);
   //处理越界
   if(file_table[fd].open_offset>fs_size||len==0){
     return 0;
