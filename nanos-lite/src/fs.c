@@ -51,7 +51,7 @@ int fs_open(const char *pathname,int flags,int mode){
 //读取文件
 ssize_t fs_read(int fd,void *buf,size_t len){
   ssize_t fs_size=fs_filesz(fd);
-   printf("Read:  len:%d,size:%d,openoffset:%d\n",len,fs_size,file_table[fd].open_offset);
+   printf("Read: fd:%d len:%d,size:%d,openoffset:%d\n",fd,len,fs_size,file_table[fd].open_offset);
   //处理越界
   if(file_table[fd].open_offset>fs_size||len==0){
     return 0;
@@ -72,7 +72,7 @@ int fs_close(int fd){
 //写入文件
 ssize_t fs_write(int fd,const void *buf,size_t len){
   ssize_t fs_size=fs_filesz(fd);
-  printf("len:%d,size:%d,openoffset:%d\n",len,fs_size,file_table[fd].open_offset);
+  printf("Write: fd:%d len:%d,size:%d,openoffset:%d\n",fd,len,fs_size,file_table[fd].open_offset);
   //处理越界
   if(file_table[fd].open_offset>fs_size){
     return 0;
