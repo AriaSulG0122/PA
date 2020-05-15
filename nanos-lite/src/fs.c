@@ -35,7 +35,7 @@ void init_fs() {
 }
 //返回一个文件的大小
 size_t fs_filesz(int fd){
-  printf("fd:%d\n",fd);
+  //printf("fd:%d\n",fd);
   return file_table[fd].size;
 }
 //打开文件并返回fd
@@ -51,7 +51,7 @@ int fs_open(const char *pathname,int flags,int mode){
 //读取文件
 ssize_t fs_read(int fd,void *buf,size_t len){
   ssize_t fs_size=fs_filesz(fd);
-   printf("Read: fd:%d len:%d,size:%d,openoffset:%d\n",fd,len,fs_size,file_table[fd].open_offset);
+   //printf("Read: fd:%d len:%d,size:%d,openoffset:%d\n",fd,len,fs_size,file_table[fd].open_offset);
   //处理越界
   if(file_table[fd].open_offset>fs_size||len==0){
     return 0;
@@ -79,7 +79,7 @@ ssize_t fs_write(int fd,const void *buf,size_t len){
     return 0;
   }
   ssize_t fs_size=fs_filesz(fd);
-  printf("Write: fd:%d len:%d,size:%d,openoffset:%d\n",fd,len,fs_size,file_table[fd].open_offset);
+  //printf("Write: fd:%d len:%d,size:%d,openoffset:%d\n",fd,len,fs_size,file_table[fd].open_offset);
   //处理越界
   if(file_table[fd].open_offset>fs_size){
     return 0;
@@ -87,7 +87,7 @@ ssize_t fs_write(int fd,const void *buf,size_t len){
   if((file_table[fd].open_offset+len)>fs_size){
     len=fs_size-file_table[fd].open_offset;
   }
-  printf("len:%d\n",len);
+  //printf("len:%d\n",len);
   ramdisk_write(buf,file_table[fd].disk_offset+file_table[fd].open_offset,len);
   file_table[fd].open_offset+=len;
   return len;
