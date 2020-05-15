@@ -35,6 +35,7 @@ void init_fs() {
 }
 //返回一个文件的大小
 size_t fs_filesz(int fd){
+  printf("fd:%d\n",fd);
   return file_table[fd].size;
 }
 //打开文件并返回fd
