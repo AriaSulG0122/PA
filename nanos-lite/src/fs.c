@@ -50,8 +50,12 @@ int fs_open(const char *pathname,int flags,int mode){
 //读取文件
 ssize_t fs_read(int fd,void *buf,size_t len){
   ssize_t fs_size=fs_filesz(fd);
-  if((file_table[fd].open_offset + len)>fs_size||len==0){//读取越界
+  //处理越界
+  if(file_table[fd].open_offset>fs_size||len==0){
     return 0;
+  }
+  if((file_table[fd].open_offset+len)>fs_size){
+    len=fs_size-file_table[fd].open_offset;
   }
   ramdisk_read(buf,file_table[fd].disk_offset+file_table[fd].open_offset,len);
   file_table[fd].open_offset+=len;
@@ -66,8 +70,12 @@ int fs_close(int fd){
 //写入文件
 ssize_t fs_write(int fd,const void *buf,size_t len){
   ssize_t fs_size=fs_filesz(fd);
-  if((file_table[fd].open_offset + len)>fs_size||len==0){//写入越界
+  //处理越界
+  if(file_table[fd].open_offset>fs_size||len==0){
     return 0;
+  }
+  if((file_table[fd].open_offset+len)>fs_size){
+    len=fs_size-file_table[fd].open_offset;
   }
   ramdisk_write(buf,file_table[fd].disk_offset+file_table[fd].open_offset,len);
   file_table[fd].open_offset+=len;
