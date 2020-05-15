@@ -75,8 +75,8 @@ ssize_t fs_write(int fd,const void *buf,size_t len){
     for(int i=0;i<len;i++){
       //将buf为首地址的len字节输出到串口
       _putc(((char*)buf)[i]);
-      return 0;
     }
+    return 0;
   }
   ssize_t fs_size=fs_filesz(fd);
   printf("Write: fd:%d len:%d,size:%d,openoffset:%d\n",fd,len,fs_size,file_table[fd].open_offset);
