@@ -71,7 +71,7 @@ int fs_close(int fd){
 ssize_t fs_write(int fd,const void *buf,size_t len){
   ssize_t fs_size=fs_filesz(fd);
   //处理越界
-  if(file_table[fd].open_offset>fs_size||len==0){
+  if(file_table[fd].open_offset>fs_size){
     return 0;
   }
   if((file_table[fd].open_offset+len)>fs_size){
