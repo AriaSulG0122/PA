@@ -6,6 +6,10 @@ extern size_t ramdisk_read(void *buf, size_t offset, size_t len);
 extern size_t ramdisk_write(const void *buf, size_t offset, size_t len);
 // 返回ramdisk的大小, 单位为字节
 extern size_t get_ramdisk_size();
+//把buf中的len字节写到屏幕上的offset处
+extern void fb_write(const void *buf, off_t offset, size_t len);
+//把字符串dispinfo中offset开始的len字节写到buf中
+extern void dispinfo_read(void *buf, off_t offset, size_t len);
 
 typedef struct {
   char *name;// 文件名
@@ -29,9 +33,11 @@ static Finfo file_table[] __attribute__((used)) = {
 
 //文件数目
 #define NR_FILES (sizeof(file_table) / sizeof(file_table[0]))
-
+//对文件记录表中/dev/fb的大小进行初始化
 void init_fs() {
   // TODO: initialize the size of /dev/fb
+  //利用ioe.c中的API来获取屏幕大小
+  file_table[FD_FB].size=_screen.height*_screen.width*sizeof(int);
 }
 //返回一个文件的大小
 size_t fs_filesz(int fd){
@@ -51,7 +57,7 @@ int fs_open(const char *pathname,int flags,int mode){
 //读取文件
 ssize_t fs_read(int fd,void *buf,size_t len){
   ssize_t fs_size=fs_filesz(fd);
-   //printf("Read: fd:%d len:%d,size:%d,openoffset:%d\n",fd,len,fs_size,file_table[fd].open_offset);
+   //printf("Read: fd:%d len:%d,size:%d,openoffset:%d\n",fd,len,fs_size,file_table[fd].open_offset); 
   //处理越界
   if(file_table[fd].open_offset>fs_size||len==0){
     return 0;
@@ -59,7 +65,12 @@ ssize_t fs_read(int fd,void *buf,size_t len){
   if((file_table[fd].open_offset+len)>fs_size){
     len=fs_size-file_table[fd].open_offset;
   }
-  ramdisk_read(buf,file_table[fd].disk_offset+file_table[fd].open_offset,len);
+  if(fd==FD_DISPINFO){
+    dispinfo_read(buf,file_table[fd].open_offset,len);
+  }
+  else{//默认写文件
+      ramdisk_read(buf,file_table[fd].disk_offset+file_table[fd].open_offset,len);
+  }
   file_table[fd].open_offset+=len;
   return len;
 }
@@ -77,6 +88,11 @@ ssize_t fs_write(int fd,const void *buf,size_t len){
       _putc(((char*)buf)[i]);
     }
     return 0;
+  }
+  if (fd==FD_FB){
+    fb_write(buf,file_table[fd].open_offset,len);
+    file_table[fd].open_offset+=len;
+    return len;
   }
   ssize_t fs_size=fs_filesz(fd);
   //printf("Write: fd:%d len:%d,size:%d,openoffset:%d\n",fd,len,fs_size,file_table[fd].open_offset);
