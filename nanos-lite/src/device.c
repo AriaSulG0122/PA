@@ -10,18 +10,18 @@ static const char *keyname[256] __attribute__((used)) = {
 //把事件写入到buf中，然后返回写入的实际长度
 size_t events_read(void *buf, size_t len)
 {
+  char str[20];
   int key=_read_key();
   bool down=false;
   if(key&0x8000){
     key^=0x8000;//获取该通码表示的按键位置
     down=true;
   }
-  char str[100]={'\0'};
-  if(key==_KEY_NONE){//没有按键，则表明为时钟事件
-    unsigned long t=_uptime();
-    sprintf(str,"t %d\n",t);
-  }else{
+  
+  if(key!=_KEY_NONE){//没有按键，则表明为时钟事件
     sprintf(str,"%s %s\n",down?"kd":"ku",keyname[key]);
+  }else{
+    sprintf(str,"t %d\n",_uptime());
   }
   if(strlen(str)<=len){
     strncpy((char*)buf,str,strlen(str));
