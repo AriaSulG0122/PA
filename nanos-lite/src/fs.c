@@ -10,6 +10,8 @@ extern size_t get_ramdisk_size();
 extern void fb_write(const void *buf, off_t offset, size_t len);
 //把字符串dispinfo中offset开始的len字节写到buf中
 extern void dispinfo_read(void *buf, off_t offset, size_t len);
+//把事件写入到buf中，然后返回写入的实际长度
+extern size_t events_read(void *buf, size_t len);
 
 typedef struct {
   char *name;// 文件名
@@ -58,6 +60,9 @@ int fs_open(const char *pathname,int flags,int mode){
 ssize_t fs_read(int fd,void *buf,size_t len){
   ssize_t fs_size=fs_filesz(fd);
    //printf("Read: fd:%d len:%d,size:%d,openoffset:%d\n",fd,len,fs_size,file_table[fd].open_offset); 
+  if (fd==FD_EVENTS){
+  return events_read(buf,len);
+  }
   //处理越界
   if(file_table[fd].open_offset>fs_size||len==0){
     return 0;
@@ -71,9 +76,11 @@ ssize_t fs_read(int fd,void *buf,size_t len){
   else{//默认写文件
       ramdisk_read(buf,file_table[fd].disk_offset+file_table[fd].open_offset,len);
   }
+  
   file_table[fd].open_offset+=len;
   return len;
 }
+
 //关闭文件
 int fs_close(int fd){
   return 0;//直接返回0，表示总是关闭成功
