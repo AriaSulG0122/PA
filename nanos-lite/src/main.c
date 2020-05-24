@@ -31,9 +31,9 @@ int main() {
 
   //uint32_t entry = loader(NULL, NULL);
   //uint32_t entry = loader(NULL, "/bin/hello");
-  uint32_t entry = loader(NULL, "/bin/text");
+  //uint32_t entry = loader(NULL, "/bin/text");
   //uint32_t entry = loader(NULL, "/bin/bmptest");
-  //uint32_t entry = loader(NULL, "/bin/events");
+  uint32_t entry = loader(NULL, "/bin/events");
   //uint32_t entry = loader(NULL, "/bin/pal");
   printf("loader end\n");
   ((void (*)(void))entry)();
