@@ -94,7 +94,7 @@ ssize_t fs_write(int fd,const void *buf,size_t len){
       //将buf为首地址的len字节输出到串口
       _putc(((char*)buf)[i]);
     }
-    return 0;
+    return len;
   }
   if (fd==FD_FB){
     fb_write(buf,file_table[fd].open_offset,len);
