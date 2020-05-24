@@ -321,3 +321,8 @@ void operand_write(Operand *op, rtlreg_t* src) {
   else if (op->type == OP_TYPE_MEM) { rtl_sm(&op->addr, op->width, src); }//写内存
   else { assert(0); }
 }
+
+
+make_DHelper(lidt_a){
+  decode_op_a(eip,id_dest,true);
+}
