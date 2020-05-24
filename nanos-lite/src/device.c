@@ -10,7 +10,7 @@ static const char *keyname[256] __attribute__((used)) = {
 //把事件写入到buf中，然后返回写入的实际长度
 size_t events_read(void *buf, size_t len)
 {
-  char str[100]={'\0'};
+  char str[100];
   int key=_read_key();
   Log("ReadKey:%s\n",keyname[key]);
   bool down=false;
