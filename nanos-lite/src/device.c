@@ -21,10 +21,10 @@ size_t events_read(void *buf, size_t len)
   
   if(key!=_KEY_NONE){//没有按键，则表明为时钟事件
     sprintf(str,"%s %s\n",down?"kd":"ku",keyname[key]);
-    Log("Key:%s\n",keyname[key]);
+    //Log("Key:%s\n",keyname[key]);
   }else{
     sprintf(str,"t %d\n",_uptime());
-    Log("Time\n");
+    //Log("Time\n");
   }
   if(strlen(str)<=len){
     strncpy((char*)buf,str,strlen(str));
