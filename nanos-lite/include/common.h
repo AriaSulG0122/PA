@@ -9,4 +9,6 @@ typedef char bool;
 #define true 1
 #define false 0
 
+_RegSet* do_syscall(_RegSet *r);
+
 #endif
