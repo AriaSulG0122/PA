@@ -1,4 +1,4 @@
-#include "common.h"
+﻿#include "common.h"
 
 /* Uncomment these macros to enable corresponding functionality. */
 #define HAS_ASYE  //Asynchronous Extension，异步处理拓展
@@ -30,7 +30,7 @@ int main() {
 
   init_fs();
   //实现文件系统后，更换用户程序只需要修改传入loader()函数的文件名即可
-  uint32_t entry = loader(NULL, "/bin/bmptest");//调用loader来加载用户程序，函数返回用户程序的入口地址
+  uint32_t entry = loader(NULL, "/bin/events");//调用loader来加载用户程序，函数返回用户程序的入口地址
   ((void (*)(void))entry)();//跳转至入口地址执行
 
   panic("Should not reach here");
