@@ -12,7 +12,7 @@ size_t events_read(void *buf, size_t len)
 {
   char str[100];
   int key=_read_key();
-  Log("ReadKey:%s\n",keyname[key]);
+  Log("ReadKey:%d,%s\n",key,keyname[key]);
   bool down=false;
   if(key&0x8000){
     key^=0x8000;//获取该通码表示的按键位置
