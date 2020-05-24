@@ -1,17 +1,18 @@
-﻿#include "cpu/exec.h"
+#include "cpu/exec.h"
 
 void diff_test_skip_qemu();
 void diff_test_skip_nemu();
 
+//在IDTR寄存器中设置IDT的首地址和长度
 make_EHelper(lidt) {
   //TODO();
-  cpu.idtr.limit = vaddr_read(id_dest->addr, 2);
-
-  if (decoding.is_operand_size_16) 
-    cpu.idtr.base = vaddr_read(id_dest->addr + 2, 4) & 0x00ffffff;  
-  else 
-    cpu.idtr.base = vaddr_read(id_dest->addr + 2, 4); 
-  
+  cpu.idtr.limit=vaddr_read(id_dest->addr,2);
+  if(decoding.is_operand_size_16){
+    cpu.idtr.base=vaddr_read(id_dest->addr+2,3);
+  }
+  else{
+    cpu.idtr.base=vaddr_read(id_dest->addr+2,4);
+  }
   print_asm_template1(lidt);
 }
 
@@ -31,10 +32,9 @@ make_EHelper(mov_cr2r) {
 #endif
 }
 
-extern void raise_intr(uint8_t NO, vaddr_t ret_addr);
 make_EHelper(int) {
-  //TODO(); 中断指令
-  raise_intr(id_dest->val, decoding.seq_eip);
+  //TODO();
+  raise_intr(id_dest->val,decoding.seq_eip);
   print_asm("int %s", id_dest->str);
 
 #ifdef DIFF_TEST
@@ -48,28 +48,28 @@ make_EHelper(iret) {
   rtl_pop(&t0);
   cpu.CS=t0;
   rtl_pop(&cpu.eflags);
-  decoding.is_jmp = 1;
+  decoding.is_jmp=1;
   print_asm("iret");
 }
 
 uint32_t pio_read(ioaddr_t, int);
 void pio_write(ioaddr_t, int, uint32_t);
 
-make_EHelper(in) {
+make_EHelper(in) {//DEST<-[SRC](Reads from I/O address space),来自手册
   //TODO();
-  t0 = pio_read(id_src->val, id_src->width);
-  operand_write(id_dest, &t0);
+  t0=pio_read(id_src->val,id_dest->width);
+  operand_write(id_dest,&t0);
   print_asm_template2(in);
 
 #ifdef DIFF_TEST
-  diff_test_skip_qemu();
+  diff_test_skip_qemu();//跳过与QEMU的检查
 #endif
 }
 
-make_EHelper(out) {
+make_EHelper(out) {//[DEST]<-SRC(I/O address space used),来自手册
   //TODO();
-  pio_write(id_dest->val, id_src->width, id_src->val);
- // print_asm_template2(out);
+  pio_write(id_dest->val,id_dest->width,id_src->val);
+  print_asm_template2(out);
 
 #ifdef DIFF_TEST
   diff_test_skip_qemu();
