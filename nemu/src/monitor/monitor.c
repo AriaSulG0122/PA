@@ -86,6 +86,9 @@ static inline void restart() {
   cpu.eflags=0x0000002;//为EFLAGS设置初始值
 
   cpu.CS=0x8;//初始化CS寄存器
+
+  cpu.CR0=0x60000011;
+
 //把QEMU的通用寄存器设置成和NEMU一样
 #ifdef DIFF_TEST
   init_qemu_reg();

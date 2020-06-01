@@ -24,14 +24,28 @@ make_EHelper(lidt) {
 }
 
 make_EHelper(mov_r2cr) {
-  TODO();
+  //TODO();
+  if(id_dest->reg==0){
+    cpu.CR0=reg_l(id_src->reg);
+  }else if(id_dest->reg==3){
+    cpu.CR3=reg_l(id_src->reg);
+  }else{
+    assert(0);
+  }
 
   print_asm("movl %%%s,%%cr%d", reg_name(id_src->reg, 4), id_dest->reg);
 }
 
 make_EHelper(mov_cr2r) {
-  TODO();
-
+  //TODO();
+  if(id_src->reg==0){
+    reg_l(id_dest->reg)=cpu.CR0;
+  }else if(id_src->reg==3){
+    reg_l(id_dest->reg)=cpu.CR3;
+  }else{
+    assert(0);
+  }
+  
   print_asm("movl %%cr%d,%%%s", id_src->reg, reg_name(id_dest->reg, 4));
 
 #ifdef DIFF_TEST

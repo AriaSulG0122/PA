@@ -58,3 +58,5 @@ make_EHelper(out);//Output to port
 make_EHelper(lidt);//Interrput Descriptor Table Register
 make_EHelper(int);//Call to Interrupt Procedure
 make_EHelper(iret);//Interrupt Return
+make_EHelper(mov_r2cr);//Move register to control register
+make_EHelper(mov_cr2r);//Move control register to register

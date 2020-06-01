@@ -64,7 +64,10 @@ typedef struct {
     uint32_t base;
     uint16_t limit;
   }idtr;//IDTR寄存器，存放IDT的首地址和长度
+  
   uint16_t CS;//代码段寄存器，里面包含CPL(Current Previlege Level)信息
+
+  uint32_t CR3,CR0;
 } CPU_state;
 extern CPU_state cpu;
 
