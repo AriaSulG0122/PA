@@ -49,6 +49,7 @@ uint32_t paddr_read(paddr_t addr, int len)
 
 paddr_t page_translate(vaddr_t vaddr)
 {
+  
   //获取页目录的基地址
   paddr_t dir = PTE_ADDR(cpu.CR3);
   //检查页目录项的present位，如发现无效表项，则终止
@@ -59,10 +60,19 @@ paddr_t page_translate(vaddr_t vaddr)
   assert(paddr_read(pg + sizeof(paddr_t) * PTX(vaddr), sizeof(paddr_t)) & PTE_P);
   //返回的物理地址需要先读取对应页表项所记录的物理地址，再加上偏移量
   return (PTE_ADDR(paddr_read(pg + sizeof(paddr_t) * PTX(vaddr), sizeof(paddr_t))) | OFF(vaddr)); 
+  
+ /*
+ //页目录
+ PDE pde *pgdir;
+ //页表
+ PTE pte,*pgtable;
+ paddr_t paddr=addr;
+ if(cpu.cr0.protect_enable*)*/
 }
 
 void paddr_write(paddr_t addr, int len, uint32_t data)
 {
+  /*
   if (is_mmio(addr) == -1)
   {
     memcpy(guest_to_host(addr), &data, len);
@@ -70,8 +80,14 @@ void paddr_write(paddr_t addr, int len, uint32_t data)
   else
   {
     mmio_write(addr, len, data, is_mmio(addr));
-  }
+  }*/
+  int mmio_id = is_mmio(addr);
+  if (mmio_id != -1)
+	mmio_write(addr, len, data, mmio_id);
+  
+  memcpy(guest_to_host(addr), &data, len);
 }
+
 // ***x86 is small end.
 uint32_t vaddr_read(vaddr_t addr, int len)
 {
