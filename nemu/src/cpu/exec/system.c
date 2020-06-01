@@ -26,9 +26,9 @@ make_EHelper(lidt) {
 make_EHelper(mov_r2cr) {
   //TODO();
   if(id_dest->reg==0){
-    cpu.CR0=reg_l(id_src->reg);
+    cpu.cr0.val=reg_l(id_src->reg);
   }else if(id_dest->reg==3){
-    cpu.CR3=reg_l(id_src->reg);
+    cpu.cr3.val=reg_l(id_src->reg);
   }else{
     assert(0);
   }
@@ -39,9 +39,9 @@ make_EHelper(mov_r2cr) {
 make_EHelper(mov_cr2r) {
   //TODO();
   if(id_src->reg==0){
-    reg_l(id_dest->reg)=cpu.CR0;
+    reg_l(id_dest->reg)=cpu.cr0.val;
   }else if(id_src->reg==3){
-    reg_l(id_dest->reg)=cpu.CR3;
+    reg_l(id_dest->reg)=cpu.cr3.val;
   }else{
     assert(0);
   }

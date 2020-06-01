@@ -2,7 +2,7 @@
 #define __REG_H__
 
 #include "common.h"
-
+#include "../memory/mmu.h"
 //***declare 32bit Regs.
 //这八个通用寄存器是RTL寄存器
 enum { R_EAX, R_ECX, R_EDX, R_EBX, R_ESP, R_EBP, R_ESI, R_EDI };
@@ -67,7 +67,9 @@ typedef struct {
   
   uint16_t CS;//代码段寄存器，里面包含CPL(Current Previlege Level)信息
 
-  uint32_t CR3,CR0;
+  //uint32_t CR3,CR0;
+  CR0 cr0;
+  CR3 cr3;
 } CPU_state;
 extern CPU_state cpu;
 
