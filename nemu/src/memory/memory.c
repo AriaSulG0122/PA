@@ -93,10 +93,15 @@ void paddr_write(paddr_t addr, int len, uint32_t data)
     mmio_write(addr, len, data, is_mmio(addr));
   }
 }
-
+bool is_cross_boundry(vaddr_t addr,int len){
+  bool result;
+  result = (((addr+len-1)&~PAGE_MASK)!=(addr&~PAGE_MASK))? true:false;
+  return result;
+}
 // ***x86 is small end.
 uint32_t vaddr_read(vaddr_t addr, int len)
 {
+  /*
   //如果发现 CR0 的 PG 位为 1,则开启分页机制
   if (cpu.cr0.paging)
   {
@@ -116,7 +121,22 @@ uint32_t vaddr_read(vaddr_t addr, int len)
       return paddr_read(page_translate(addr,false), len);
     }
   }
-  return paddr_read(addr, len);
+  return paddr_read(addr, len);*/
+  paddr_t paddr;
+  if(is_cross_boundry(addr,len)){
+    union{
+      uint8_t bytes[4];
+      uint32_t dword;
+    }data={0};
+    for(int i=0;i<len;i++){
+      paddr=page_translate(addr+i,false);
+      data.bytes[i]=paddr_read(paddr,1);
+    }
+    return data.dword;
+  }else{
+    paddr=page_translate(addr,false);
+    return paddr_read(paddr,len);
+  }
 }
 
 void vaddr_write(vaddr_t addr, int len, uint32_t data)
