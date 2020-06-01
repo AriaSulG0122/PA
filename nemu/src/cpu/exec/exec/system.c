@@ -51,6 +51,7 @@ make_EHelper(mov_cr2r) {
   diff_test_skip_qemu();
 #endif
 }
+
 make_EHelper(int) {
   //TODO();
   raise_intr(id_dest->val,decoding.seq_eip);
@@ -72,20 +73,16 @@ make_EHelper(iret) {
   cpu.cs=(uint16_t)t0;
   rtl_pop(&t0);
   cpu.eflags=t0;*/
-  /*
+  
   rtl_pop(&cpu.eip);
-  rtl_pop(&cpu.cs);
+  rtl_pop(&t0);
+  cpu.CS=t0;
   rtl_pop(&t0);
   memcpy(&cpu.eflags,&t0,sizeof(cpu.eflags));
 
   decoding.jmp_eip=1;
   decoding.seq_eip=cpu.eip;
-  */
-  rtl_pop(&decoding.jmp_eip);
-  rtl_pop(&t0);
-  cpu.CS=t0;
-  rtl_pop(&cpu.eflags);
-  decoding.is_jmp=1;
+
   print_asm("iret");
 }
 
