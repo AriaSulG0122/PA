@@ -112,7 +112,7 @@ uint32_t vaddr_read(vaddr_t addr, int len)
     }
     else
     { //否则直接转换就行了
-      Log("paddr_read:0x%08x",page_translate(addr,false));
+      //Log("paddr_read:0x%08x",page_translate(addr,false));
       return paddr_read(page_translate(addr,false), len);
     }
   }
