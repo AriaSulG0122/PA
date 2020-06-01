@@ -54,11 +54,11 @@ paddr_t page_translate(vaddr_t vaddr)
   //检查页目录项的present位，如发现无效表项，则终止
   assert(paddr_read(dir + sizeof(paddr_t) * PDX(vaddr), sizeof(paddr_t)) & PTE_P);
   //读取页表项的基地址
-  paddr_t pg=PTE_ADDR(paddr_read(dir+sizeof(paddr_t)*PDX(vaddr),sizeof(paddr_t)));
+  paddr_t pg = PTE_ADDR(paddr_read(dir + sizeof(paddr_t) * PDX(vaddr), sizeof(paddr_t)));
   //检查页表项的present位，如发现无效表项，则终止
   assert(paddr_read(pg + sizeof(paddr_t) * PTX(vaddr), sizeof(paddr_t)) & PTE_P);
   //返回的物理地址需要先读取对应页表项所记录的物理地址，再加上偏移量
-  return (PTE_ADDR(paddr_read(pg + sizeof(paddr_t) * PTX(vaddr), sizeof(paddr_t))) | OFF(vaddr));
+  return (PTE_ADDR(paddr_read(pg + sizeof(paddr_t) * PTX(vaddr), sizeof(paddr_t))) | OFF(vaddr)); 
 }
 
 void paddr_write(paddr_t addr, int len, uint32_t data)
