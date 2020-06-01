@@ -72,7 +72,6 @@ paddr_t page_translate(vaddr_t vaddr)
 
 void paddr_write(paddr_t addr, int len, uint32_t data)
 {
-  /*
   if (is_mmio(addr) == -1)
   {
     memcpy(guest_to_host(addr), &data, len);
@@ -80,12 +79,7 @@ void paddr_write(paddr_t addr, int len, uint32_t data)
   else
   {
     mmio_write(addr, len, data, is_mmio(addr));
-  }*/
-  int mmio_id = is_mmio(addr);
-  if (mmio_id != -1)
-	mmio_write(addr, len, data, mmio_id);
-  
-  memcpy(guest_to_host(addr), &data, len);
+  }
 }
 
 // ***x86 is small end.
@@ -106,6 +100,7 @@ uint32_t vaddr_read(vaddr_t addr, int len)
     }
     else
     { //否则直接转换就行了
+      Log("paddr_read:0x%08x",page_translate(addr));
       return paddr_read(page_translate(addr), len);
     }
   }
