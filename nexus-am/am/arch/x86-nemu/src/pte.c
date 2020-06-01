@@ -14,6 +14,7 @@ _Area segments[] = {      // Kernel memory mappings
 #define NR_KSEG_MAP (sizeof(segments) / sizeof(segments[0]))
 
 void _pte_init(void* (*palloc)(), void (*pfree)(void*)) {
+  //需要提供物理页的分配和回收两个回调函数，用于从AM中获取/释放物理页
   palloc_f = palloc;
   pfree_f = pfree;
 
@@ -23,7 +24,7 @@ void _pte_init(void* (*palloc)(), void (*pfree)(void*)) {
   for (i = 0; i < NR_PDE; i ++) {
     kpdirs[i] = 0;
   }
-
+  //填写内核的页目录和页表
   PTE *ptab = kptabs;
   for (i = 0; i < NR_KSEG_MAP; i ++) {
     uint32_t pdir_idx = (uintptr_t)segments[i].start / (PGSIZE * NR_PTE);
@@ -41,8 +42,9 @@ void _pte_init(void* (*palloc)(), void (*pfree)(void*)) {
       }
     }
   }
-
+  //设置CR3寄存器
   set_cr3(kpdirs);
+  //通过设置CR0寄存器来开启分页机制
   set_cr0(get_cr0() | CR0_PG);
 }
 
@@ -65,7 +67,28 @@ void _switch(_Protect *p) {
   set_cr3(p->ptr);
 }
 
+//将虚拟地址空间p中的虚拟地址va映射到物理地址pa
 void _map(_Protect *p, void *va, void *pa) {
+  //获取页目录的基地址pgdir
+  PDE* pde,*pgdir=p->ptr;
+  PTE *pgtable;
+  //获取va对应的页目录项
+  pde=&pgdir[PDX(va)];
+  if(*pde&PTE_P){//若页目录项存在，则获取对应的页表基地址
+    pgtable=(PTE*)PTE_ADDR(*pde);
+  }else{//若页目录项不存在
+    //申请空闲物理页
+    pgtable=(PTE*)palloc_f();
+    //将该物理页清零，表明目前的每一个页表项都不存在映射
+    for(int i=0;i<NR_PTE;i++){
+      pgtable[i]=0;
+    }
+    //设置该页目录项及其P位，下一次访问就存在了
+    *pde=PTE_ADDR(pgtable)|PTE_P;
+  }
+  //设置页表项中物理页的映射关系，同时设置P位
+  pgtable[PTX(va)]=PTE_ADDR(pa)|PTE_P;
+  
 }
 
 void _unmap(_Protect *p, void *va) {

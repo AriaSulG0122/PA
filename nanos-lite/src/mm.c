@@ -19,9 +19,12 @@ int mm_brk(uint32_t new_brk) {
   return 0;
 }
 
+//初始化MM，MM是存储管理器(Memory Manager)模块，专门负责分页相关的存储管理
 void init_mm() {
+  //将TRM提供的堆区起始地址作为空闲物理页的首地址
+  //将来会通过new_page()函数来分配空闲的物理页
   pf = (void *)PGROUNDUP((uintptr_t)_heap.start);
   Log("free physical pages starting from %p", pf);
-
+  //调用AM的_pte_init函数
   _pte_init(new_page, free_page);
 }

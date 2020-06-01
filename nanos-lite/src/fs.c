@@ -73,7 +73,7 @@ ssize_t fs_read(int fd,void *buf,size_t len){
   if(fd==FD_DISPINFO){
     dispinfo_read(buf,file_table[fd].open_offset,len);
   }
-  else{//默认写文件
+  else{//默认读文件
       ramdisk_read(buf,file_table[fd].disk_offset+file_table[fd].open_offset,len);
   }
   

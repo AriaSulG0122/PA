@@ -1,8 +1,10 @@
-﻿#include "common.h"
+#include "common.h"
 
 /* Uncomment these macros to enable corresponding functionality. */
 #define HAS_ASYE  //Asynchronous Extension，异步处理拓展
-//#define HAS_PTE
+#define HAS_PTE   //Protection Extension 保护扩展，为计算机提供存储保护的能力
+
+extern void load_prog(const char *filename);
 
 void init_mm(void);
 void init_ramdisk(void);
@@ -30,8 +32,9 @@ int main() {
 
   init_fs();
   //实现文件系统后，更换用户程序只需要修改传入loader()函数的文件名即可
-  uint32_t entry = loader(NULL, "/bin/pal");//调用loader来加载用户程序，函数返回用户程序的入口地址
-  ((void (*)(void))entry)();//跳转至入口地址执行
+  //uint32_t entry = loader(NULL, "/bin/events");//调用loader来加载用户程序，函数返回用户程序的入口地址
+  //((void (*)(void))entry)();//跳转至入口地址执行
+  load_prog("/bin/dummy");
 
   panic("Should not reach here");
 }
