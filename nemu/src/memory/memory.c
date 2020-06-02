@@ -104,7 +104,7 @@ bool is_cross_boundry(vaddr_t addr,int len){
 // ***x86 is small end.
 uint32_t vaddr_read(vaddr_t addr, int len)
 {
-  /*
+  
   //如果发现 CR0 的 PG 位为 1,则开启分页机制
   if (cpu.cr0.paging)
   {
@@ -117,7 +117,8 @@ uint32_t vaddr_read(vaddr_t addr, int len)
       uint32_t first = paddr_read(page_translate(addr,false), firstLen);
       uint32_t second = paddr_read(page_translate(addr + firstLen,false), secondLen);
       //对两次转换结果进行拼接
-      return (second << (8 * firstLen)) | first;
+      //return (second << (8 * firstLen)) | first;
+      return (first<<(8*secondLen))|second;
     }
     else
     { //否则直接转换就行了
@@ -126,7 +127,7 @@ uint32_t vaddr_read(vaddr_t addr, int len)
     }
   }
   return paddr_read(addr, len);
-  */
+  
  /*
   paddr_t paddr;
   if(is_cross_boundry(addr,len)){
@@ -144,6 +145,7 @@ uint32_t vaddr_read(vaddr_t addr, int len)
     return paddr_read(paddr,len);
   }*/
   // Log("vaddr_read: 0x%x", addr);
+  /*
   int data_cross = (addr % PAGE_SIZE + len) > PAGE_SIZE;
   if (data_cross) {
     int prev = PAGE_SIZE - addr % PAGE_SIZE;
@@ -159,7 +161,7 @@ uint32_t vaddr_read(vaddr_t addr, int len)
     paddr_t paddr = page_translate(addr,false);
     Log("paddr_read: 0x%x", paddr);
     return paddr_read(paddr, len);
-  }
+  }*/
 }
 
 void vaddr_write(vaddr_t addr, int len, uint32_t data)
