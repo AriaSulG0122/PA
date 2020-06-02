@@ -1,5 +1,5 @@
 #include <x86.h>
-
+#include <stdio.h>
 #define PG_ALIGN __attribute((aligned(PGSIZE)))
 
 static PDE kpdirs[NR_PDE] PG_ALIGN;
@@ -79,6 +79,7 @@ void _map(_Protect *p, void *va, void *pa) {
   }else{//若页目录项不存在
     //申请空闲物理页
     pgtable=(PTE*)palloc_f();
+    //Log("pgtable:0x%08x\n",pgtable);
     //将该物理页清零，表明目前的每一个页表项都不存在映射
     for(int i=0;i<NR_PTE;i++){
       pgtable[i]=0;
@@ -88,7 +89,6 @@ void _map(_Protect *p, void *va, void *pa) {
   }
   //设置页表项中物理页的映射关系，同时设置P位
   pgtable[PTX(va)]=PTE_ADDR(pa)|PTE_P;
-  
 }
 
 void _unmap(_Protect *p, void *va) {
