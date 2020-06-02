@@ -111,12 +111,14 @@ uint32_t vaddr_read(vaddr_t addr, int len)
     //数据跨越了边界，则要进行两次转换
     if (OFF(addr) + len > PGSIZE)
     {
+      assert(0);
+      /*
       int firstLen = PGSIZE - OFF(addr);
       int secondLen = len - firstLen;
       uint32_t first = paddr_read(page_translate(addr,false), firstLen);
       uint32_t second = paddr_read(page_translate(addr + firstLen,false), secondLen);
       //对两次转换结果进行拼接
-      return (second << (8 * firstLen)) | first;
+      return (second << (8 * firstLen)) | first;*/
     }
     else
     { //否则直接转换就行了
