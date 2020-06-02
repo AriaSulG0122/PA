@@ -1,4 +1,4 @@
-#include "nemu.h"
+﻿#include "nemu.h"
 //*** Analog memory
 #define PMEM_SIZE (128 * 1024 * 1024)
 
@@ -85,8 +85,8 @@ paddr_t page_translate(vaddr_t addr,bool is_write)
     assert(pte.present);
   }
   if(addr==0x8048000){
-    Log("CR3:0x%08x",cpu.cr3.val);
-    Log("pte.val:0x%08x",pte.val);
+    Log("page_translate: dir: 0x%x, page: 0x%x, offset: 0x%x, PDT_base: 0x%x", dir, page, offset, PDT_base);
+    Log("pde.val:0x%08x, pte.val:0x%08x",pde.val,pte.val);
     }
   paddr_t paddr = (pte.page_frame << 12) | offset;
   // Log("page_translate: paddr: 0x%x\n", paddr);
