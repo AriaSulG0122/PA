@@ -83,7 +83,10 @@ paddr_t page_translate(vaddr_t addr,bool is_write)
     Log("page_translate: addr: 0x%x\n", addr);
     assert(pte.present);
   }
-  if(addr==0x8048000){Log("pte.val:0x%08x",pte.val);}
+  if(addr==0x8048000){
+    Log("PDT_base:0x%08x",PDT_base);
+    Log("pte.val:0x%08x",pte.val);
+    }
   paddr_t paddr = (pte.page_frame << 12) | offset;
   // Log("page_translate: paddr: 0x%x\n", paddr);
   return paddr;
