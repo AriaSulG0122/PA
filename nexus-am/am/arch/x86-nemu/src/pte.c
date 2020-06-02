@@ -73,7 +73,7 @@ void _map(_Protect *p, void *va, void *pa) {
   //获取页目录的基地址pgdir
   PDE* pde,*pgdir=p->ptr;
   PTE *pgtable;
-  //获取va对应的页目录项
+  //获取va对应的页目录项地址
   pde=&pgdir[PDX(va)];
   if(*pde&PTE_P){//若页目录项存在，则获取对应的页表基地址
     pgtable=(PTE*)PTE_ADDR(*pde);
