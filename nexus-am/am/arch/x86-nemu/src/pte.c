@@ -1,5 +1,5 @@
 #include <x86.h>
-#include <stdio.h>
+
 #define PG_ALIGN __attribute((aligned(PGSIZE)))
 
 static PDE kpdirs[NR_PDE] PG_ALIGN;
@@ -68,31 +68,29 @@ void _switch(_Protect *p) {
 }
 
 //将虚拟地址空间p中的虚拟地址va映射到物理地址pa
-void _map(_Protect *p, void *va, void *pa) {
-	void* addrPDE = p->ptr;
-  //获取页目录基地址
-	PDE* basePDE = (PDE*) addrPDE;
-	//目录项
-	uint32_t dir = PDX(va);
-  //页表项
-	uint32_t page = PTX(va);
- 
-	if(!(basePDE[dir] & 0x1)){//不存在页目录项
-    //分配页表空间
-		PTE* basePTE = (PTE*)palloc_f();
-    //找到页目录项，赋予值
-		basePDE[dir] = (uint32_t)basePTE | PTE_P;
-    //找到页表基址
-		basePTE = (PTE*)(basePDE[dir] & 0xfffff000);
-    //设置页表项的值
-		basePTE[page] = (uint32_t)pa | PTE_P;
-	}
-	else{//存在页目录项
-		PTE* basePTE = (PTE*)(basePDE[dir] & 0xfffff000);
-		basePTE[page] = (uint32_t)pa | PTE_P;	
-	}
+void _map(_Protect *p, void *va, void *pa,void* mydata) {
+  
+  //获取页目录的基地址pgdir
+  PDE* pde,*pgdir=p->ptr;
+  PTE *pgtable;
+  //获取va对应的页目录项地址pde
+  pde=&pgdir[PDX(va)];
+  if(*pde&PTE_P){//若页目录项存在，则获取对应的页表基地址
+    pgtable=(PTE*)PTE_ADDR(*pde);
+  }else{//若页目录项不存在
+    //申请空闲物理页
+    pgtable=(PTE*)palloc_f();
+    //将该物理页清零，表明目前的每一个页表项都不存在映射
+    for(int i=0;i<NR_PTE;i++){
+      pgtable[i]=0;
+    }
+    //设置该页目录项及其P位，下一次访问就存在了
+    *pde=PTE_ADDR(pgtable)|PTE_P;
+  }
+  //设置页表项中物理页的映射关系，同时设置P位
+  pgtable[PTX(va)]=PTE_ADDR(pa)|PTE_P;
+  mydata=pa;
 }
-
 
 void _unmap(_Protect *p, void *va) {
 }
