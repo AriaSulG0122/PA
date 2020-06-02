@@ -47,7 +47,7 @@ uint32_t paddr_read(paddr_t addr, int len)
   //***(4-len)<<3 = (4-len)*2^3,     ~ = take inverse
 }
 
-paddr_t page_translate(vaddr_t vaddr,bool is_write)
+paddr_t page_translate(vaddr_t addr,bool is_write)
 {
   /*
   //获取页目录的基地址
@@ -61,7 +61,7 @@ paddr_t page_translate(vaddr_t vaddr,bool is_write)
   //返回的物理地址需要先读取对应页表项所记录的物理地址，再加上偏移量
   return (PTE_ADDR(paddr_read(pg + sizeof(paddr_t) * PTX(vaddr), sizeof(paddr_t))) | OFF(vaddr)); 
   */
- 
+ /*
  //页目录
  PDE pde,*pgdir;
  //页表
@@ -81,7 +81,31 @@ paddr_t page_translate(vaddr_t vaddr,bool is_write)
    pte.dirty=is_write?1:0;
    paddr=(pte.page_frame<<12)|(vaddr&PAGE_MASK);
  }
- return paddr;
+ return paddr;*/
+  if (!cpu.cr0.paging) return addr;
+  // Log("page_translate: addr: 0x%x\n", addr);
+  paddr_t dir = (addr >> 22) & 0x3ff;
+  paddr_t page = (addr >> 12) & 0x3ff;
+  paddr_t offset = addr & 0xfff;
+  paddr_t PDT_base = cpu.cr3.page_directory_base;
+  // Log("page_translate: dir: 0x%x page: 0x%x offset: 0x%x PDT_base: 0x%x\n", dir, page, offset, PDT_base);
+  PDE pde;
+  pde.val = paddr_read((PDT_base << 12) + (dir << 2), 4);
+  if (!pde.present) {
+    Log("page_translate: addr: 0x%x\n", addr);
+    Log("page_translate: dir: 0x%x page: 0x%x offset: 0x%x PDT_base: 0x%x\n", dir, page, offset, PDT_base);
+    assert(pde.present);
+  }
+  PTE pte;
+  // Log("page_translate: page_frame: 0x%x\n", pde.page_frame);
+  pte.val = paddr_read((pde.page_frame << 12) + (page << 2), 4);
+  if (!pte.present) {
+    Log("page_translate: addr: 0x%x\n", addr);
+    assert(pte.present);
+  }
+  paddr_t paddr = (pte.page_frame << 12) | offset;
+  // Log("page_translate: paddr: 0x%x\n", paddr);
+  return paddr;
 }
 
 void paddr_write(paddr_t addr, int len, uint32_t data)
@@ -105,7 +129,6 @@ bool is_cross_boundry(vaddr_t addr,int len){
 // ***x86 is small end.
 uint32_t vaddr_read(vaddr_t addr, int len)
 {
-  
   //如果发现 CR0 的 PG 位为 1,则开启分页机制
   if (cpu.cr0.paging)
   {
