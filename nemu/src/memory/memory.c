@@ -83,7 +83,7 @@ paddr_t page_translate(vaddr_t addr,bool is_write)
     Log("page_translate: addr: 0x%x\n", addr);
     assert(pte.present);
   }
-  Log("pte.val:0x%08x",pte.val);
+  if(addr==0x8048000){Log("pte.val:0x%08x",pte.val);}
   paddr_t paddr = (pte.page_frame << 12) | offset;
   // Log("page_translate: paddr: 0x%x\n", paddr);
   return paddr;
@@ -147,7 +147,9 @@ uint32_t vaddr_read(vaddr_t addr, int len)
     }
     else
     { //否则直接转换就行了
-      Log("vaddr:0x%08x,paddr:0x%08x",addr,page_translate(addr,false));
+      if(addr==0x8048000){
+        Log("vaddr:0x%08x,paddr:0x%08x",addr,page_translate(addr,false));
+      }
       return paddr_read(page_translate(addr,false), len);
     }
   }
