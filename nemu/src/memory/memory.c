@@ -66,7 +66,7 @@ paddr_t page_translate(vaddr_t addr,bool is_write)
   paddr_t offset = addr & 0xfff;
   //获取页目录基址
   paddr_t PDT_base = cpu.cr3.page_directory_base;
-  Log("CR3:0x%08x",cpu.cr3.val);
+  //Log("CR3:0x%08x",cpu.cr3.val);
   //Log("page_translate: dir: 0x%x page: 0x%x offset: 0x%x PDT_base: 0x%x\n", dir, page, offset, PDT_base);
   PDE pde;
   //读取对应的页目录项
@@ -85,7 +85,7 @@ paddr_t page_translate(vaddr_t addr,bool is_write)
     assert(pte.present);
   }
   if(addr==0x8048000){
-    
+    Log("CR3:0x%08x",cpu.cr3.val);
     Log("pte.val:0x%08x",pte.val);
     }
   paddr_t paddr = (pte.page_frame << 12) | offset;
