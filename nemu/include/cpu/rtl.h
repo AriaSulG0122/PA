@@ -1,4 +1,4 @@
-#ifndef __RTL_H__
+﻿#ifndef __RTL_H__
 #define __RTL_H__
 
 #include "nemu.h"
@@ -215,5 +215,10 @@ static inline void rtl_update_ZFSF(const rtlreg_t* result, int width) {
   rtl_update_ZF(result, width);
   rtl_update_SF(result, width);
 }
-
+static inline void rtl_roi(rtlreg_t* dest, const rtlreg_t* src1, const rtlreg_t* src2) {
+  // dest <- src1[width * 8 - 1]
+  uint32_t src = *src1;
+  uint32_t n = *src2;
+  *dest = (src>>(32-n)) | (src<<n);
+}
 #endif
