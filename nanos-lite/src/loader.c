@@ -1,6 +1,6 @@
 #include "common.h"
 
-#define DEFAULT_ENTRY ((void *)0x8048000)
+#define DEFAULT_ENTRY ((void *)0x4000000)
 
 // 从ramdisk中`offset`偏移处的`len`字节读入到`buf`中
 extern size_t ramdisk_read(void *buf, size_t offset, size_t len);
@@ -21,8 +21,10 @@ uintptr_t loader(_Protect *as, const char *filename) {
   //TODO();
   //ramdisk_read(DEFAULT_ENTRY,0,get_ramdisk_size());
   int fd=fs_open(filename,0,0);
-  //fs_read(fd,DEFAULT_ENTRY,fs_filesz(fd));
-  //printf("Load file:%d",fd);
+  fs_read(fd,DEFAULT_ENTRY,fs_filesz(fd));
+  printf("Load file:%d",fd);
+  
+  /*
   //读取文件长度
   size_t len=fs_filesz(fd);
   //读取文件末尾位置
@@ -38,6 +40,8 @@ uintptr_t loader(_Protect *as, const char *filename) {
     //读取文件，读取长度不能超过页的大小
     fs_read(fd,pa,(pa-va)<PGSIZE?(end-va):PGSIZE);
   }
+  */
+
   fs_close(fd);
   return (uintptr_t)DEFAULT_ENTRY;
 }
