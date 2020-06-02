@@ -68,7 +68,7 @@ paddr_t page_translate(vaddr_t vaddr,bool is_write)
  PTE pte,*pgtable;
  paddr_t paddr=vaddr;
  if(cpu.cr0.protect_enable&&cpu.cr0.paging){
-   Log("cr0:0x%08x,cr3:0x%08x",cpu.cr0.val,cpu.cr3.val);
+   //Log("cr0:0x%08x,cr3:0x%08x",cpu.cr0.val,cpu.cr3.val);
    pgdir=(PDE*)(intptr_t)(cpu.cr3.page_directory_base<<12);
    pde.val=paddr_read((intptr_t)&pgdir[(vaddr>>22)&0x3ff],4);
    assert(pde.present);//检查present位
