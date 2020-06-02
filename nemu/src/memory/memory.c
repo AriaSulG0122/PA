@@ -79,7 +79,6 @@ paddr_t page_translate(vaddr_t vaddr,bool is_write)
    pte.dirty=is_write?1:0;
    paddr=(pte.page_frame<<12)|(vaddr&PAGE_MASK);
  }
-
  return paddr;
 }
 
@@ -104,7 +103,6 @@ bool is_cross_boundry(vaddr_t addr,int len){
 // ***x86 is small end.
 uint32_t vaddr_read(vaddr_t addr, int len)
 {
-  
   //如果发现 CR0 的 PG 位为 1,则开启分页机制
   if (cpu.cr0.paging)
   {
@@ -114,11 +112,12 @@ uint32_t vaddr_read(vaddr_t addr, int len)
       //assert(0);
       int firstLen = PGSIZE - OFF(addr);
       int secondLen = len - firstLen;
+
       uint32_t first = paddr_read(page_translate(addr,false), firstLen);
       uint32_t second = paddr_read(page_translate(addr + firstLen,false), secondLen);
+      Log("First:0x%08x,Second:0x%08x",first,second);
       //对两次转换结果进行拼接
-      //return (second << (8 * firstLen)) | first;
-      return (first<<(8*secondLen))|second;
+      return (second << (8 * firstLen)) | first;
     }
     else
     { //否则直接转换就行了
