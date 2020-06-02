@@ -35,7 +35,7 @@ uint8_t pmem[PMEM_SIZE];
 //***Get the last 8|16|24|32 bits of pmem_rw(addr,uint32_t)
 uint32_t paddr_read(paddr_t addr, int len)
 {
-  Log("paddr_read:0x%08x",addr);
+  //Log("paddr_read:0x%08x",addr);
   if (is_mmio(addr) == -1)
   { //为-1，则不是内存映射I/O的访问
     return pmem_rw(addr, uint32_t) & (~0u >> ((4 - len) << 3));
@@ -121,7 +121,7 @@ uint32_t vaddr_read(vaddr_t addr, int len)
     }
     else
     { //否则直接转换就行了
-      //Log("paddr_read:0x%08x",page_translate(addr,false));
+      Log("paddr_read:0x%08x",page_translate(addr,false));
       return paddr_read(page_translate(addr,false), len);
     }
   }
