@@ -49,7 +49,7 @@ uint32_t paddr_read(paddr_t addr, int len)
 
 paddr_t page_translate(vaddr_t vaddr,bool is_write)
 {
-  
+  /*
   //获取页目录的基地址
   paddr_t dir = PTE_ADDR(cpu.cr3.val);
   //检查页目录项的present位，如发现无效表项，则终止
@@ -60,14 +60,15 @@ paddr_t page_translate(vaddr_t vaddr,bool is_write)
   assert(paddr_read(pg + sizeof(paddr_t) * PTX(vaddr), sizeof(paddr_t)) & PTE_P);
   //返回的物理地址需要先读取对应页表项所记录的物理地址，再加上偏移量
   return (PTE_ADDR(paddr_read(pg + sizeof(paddr_t) * PTX(vaddr), sizeof(paddr_t))) | OFF(vaddr)); 
-  
- /*
+  */
+ 
  //页目录
  PDE pde,*pgdir;
  //页表
  PTE pte,*pgtable;
  paddr_t paddr=vaddr;
  if(cpu.cr0.protect_enable&&cpu.cr0.paging){
+   Log("cr3:0x%08x",cpu.cr3.val);
    pgdir=(PDE*)(intptr_t)(cpu.cr3.page_directory_base<<12);
    pde.val=paddr_read((intptr_t)&pgdir[(vaddr>>22)&0x3ff],4);
    assert(pde.present);
@@ -79,7 +80,7 @@ paddr_t page_translate(vaddr_t vaddr,bool is_write)
    pte.dirty=is_write?1:0;
    paddr=(pte.page_frame<<12)|(vaddr&PAGE_MASK);
  }
- return paddr;*/
+ return paddr;
 }
 
 void paddr_write(paddr_t addr, int len, uint32_t data)
