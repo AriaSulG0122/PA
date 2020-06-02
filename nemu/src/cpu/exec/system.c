@@ -29,6 +29,7 @@ make_EHelper(mov_r2cr) {
     cpu.cr0.val=reg_l(id_src->reg);
   }else if(id_dest->reg==3){
     cpu.cr3.val=reg_l(id_src->reg);
+    Log("CR3 changed:0x%08x",cpu.cr3.val);
   }else{
     assert(0);
   }
