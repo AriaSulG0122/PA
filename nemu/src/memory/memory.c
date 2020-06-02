@@ -32,21 +32,6 @@ uint8_t pmem[PMEM_SIZE];
 
 /* Memory accessing interfaces */
 
-//***Get the last 8|16|24|32 bits of pmem_rw(addr,uint32_t)
-uint32_t paddr_read(paddr_t addr, int len)
-{
-  //Log("paddr_read:0x%08x",addr);
-  if (is_mmio(addr) == -1)
-  { //为-1，则不是内存映射I/O的访问
-    return pmem_rw(addr, uint32_t) & (~0u >> ((4 - len) << 3));
-  }
-  else
-  {
-    return mmio_read(addr, len, is_mmio(addr)); //根据映射号访问内存映射I/O
-  }
-  //***(4-len)<<3 = (4-len)*2^3,     ~ = take inverse
-}
-
 paddr_t page_translate(vaddr_t addr,bool is_write)
 {
   /*
@@ -108,6 +93,22 @@ paddr_t page_translate(vaddr_t addr,bool is_write)
   return paddr;
 }
 
+
+//***Get the last 8|16|24|32 bits of pmem_rw(addr,uint32_t)
+uint32_t paddr_read(paddr_t addr, int len)
+{
+  //Log("paddr_read:0x%08x",addr);
+  if (is_mmio(addr) == -1)
+  { //为-1，则不是内存映射I/O的访问
+    return pmem_rw(addr, uint32_t) & (~0u >> ((4 - len) << 3));
+  }
+  else
+  {
+    return mmio_read(addr, len, is_mmio(addr)); //根据映射号访问内存映射I/O
+  }
+  //***(4-len)<<3 = (4-len)*2^3,     ~ = take inverse
+}
+
 void paddr_write(paddr_t addr, int len, uint32_t data)
 {
   if (is_mmio(addr) == -1)
@@ -120,11 +121,13 @@ void paddr_write(paddr_t addr, int len, uint32_t data)
   }
 }
 
+
 bool is_cross_boundry(vaddr_t addr,int len){
   bool result;
   result = (((addr+len-1)&~PAGE_MASK)!=(addr&~PAGE_MASK))? true:false;
   return result;
 }
+
 
 // ***x86 is small end.
 uint32_t vaddr_read(vaddr_t addr, int len)
