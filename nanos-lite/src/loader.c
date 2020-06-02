@@ -38,7 +38,7 @@ uintptr_t loader(_Protect *as, const char *filename) {
     void* pa=new_page();
     //将虚拟页映射到获取到的物理页
     Log("Map va:0x%08x to pa:0x%08x",va,pa);
-    void* mydata=NULL;
+    uint32_t mydata=0;
     _map(as,va,pa,mydata);
     Log("MyData:0x%08x",mydata);
     Log("PDT_Base:0x%08x",as->ptr);
