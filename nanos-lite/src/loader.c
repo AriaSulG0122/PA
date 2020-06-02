@@ -36,7 +36,7 @@ uintptr_t loader(_Protect *as, const char *filename) {
     Log("Map va:0x%08x to pa:0x%08x",va,pa);
     _map(as,va,pa);
     //读取文件，读取长度不能超过页的大小
-    fs_read(fd,pa,(pa-va)<PGSIZE?(end-va):PGSIZE);
+    fs_read(fd,pa,len);
   }
   fs_close(fd);
   return (uintptr_t)DEFAULT_ENTRY;
