@@ -39,7 +39,7 @@ uintptr_t loader(_Protect *as, const char *filename) {
     //将虚拟页映射到获取到的物理页
     Log("Map va:0x%08x to pa:0x%08x",va,pa);
     uint32_t mydata=0;
-    _map(as,va,pa,mydata);
+    mydata=_map(as,va,pa);
     Log("MyData:0x%08x",mydata);
     Log("PDT_Base:0x%08x",as->ptr);
     //读取文件，读取长度不能超过页的大小

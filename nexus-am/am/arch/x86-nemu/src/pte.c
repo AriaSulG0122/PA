@@ -68,7 +68,7 @@ void _switch(_Protect *p) {
 }
 
 //将虚拟地址空间p中的虚拟地址va映射到物理地址pa
-void _map(_Protect *p, void *va, void *pa,uint32_t mydata) {
+uint32_t _map(_Protect *p, void *va, void *pa) {
   
   //获取页目录的基地址pgdir
   PDE* pde,*pgdir=p->ptr;
@@ -89,7 +89,7 @@ void _map(_Protect *p, void *va, void *pa,uint32_t mydata) {
   }
   //设置页表项中物理页的映射关系，同时设置P位
   pgtable[PTX(va)]=PTE_ADDR(pa)|PTE_P;
-  mydata=PTE_ADDR(pa)|PTE_P;
+  return PTE_ADDR(pa)|PTE_P;
 }
 
 void _unmap(_Protect *p, void *va) {
