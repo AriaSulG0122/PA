@@ -2,25 +2,25 @@
 //*** Analog memory
 #define PMEM_SIZE (128 * 1024 * 1024)
 
-//¿ØÖÆ¼Ä´æÆ÷±êÖ¾
-#define CR0_PG 0x80000000 //PagingÎ»
+//æ§åˆ¶å¯„å­˜å™¨æ ‡å¿—
+#define CR0_PG 0x80000000 //Pagingä½
 
-//Ò³±í»òÒ³Ä¿Â¼µÄpresent±êÖ¾Î»
-#define PTE_P 0x001 //PresentÎ»
+//é¡µè¡¨æˆ–é¡µç›®å½•çš„presentæ ‡å¿—ä½
+#define PTE_P 0x001 //Presentä½
 
-//Ò³±í´óĞ¡
+//é¡µè¡¨å¤§å°
 #define PGSIZE 4096
 
 //typedef uint32_t PTE;
 //typedef uint32_t PDE;
-//Ç°Ê®Î»ÊÇÒ³Ä¿Â¼Ïî
+//å‰åä½æ˜¯é¡µç›®å½•é¡¹
 #define PDX(va) (((uint32_t)(va) >> 22) & 0x3ff)
-//ÖĞ¼äÊ®Î»ÊÇÒ³±íÏî
+//ä¸­é—´åä½æ˜¯é¡µè¡¨é¡¹
 #define PTX(va) (((uint32_t)(va) >> 12) & 0x3ff)
-//×îºóÊ®¶şÎ»ÊÇÒ³ÄÚÆ«ÒÆ
+//æœ€ååäºŒä½æ˜¯é¡µå†…åç§»
 #define OFF(va) ((uint32_t)(va)&0xfff)
 
-//ÔÚÒ³±íºÍÒ³Ä¿Â¼ÖĞµÄµØÖ·£¬È¡¸ß20Î»
+//åœ¨é¡µè¡¨å’Œé¡µç›®å½•ä¸­çš„åœ°å€ï¼Œå–é«˜20ä½
 #define PTE_ADDR(pte) ((uint32_t)(pte) & ~0xfff)
 
 #define pmem_rw(addr, type) *(type *)({                                       \
@@ -32,66 +32,61 @@ uint8_t pmem[PMEM_SIZE];
 
 /* Memory accessing interfaces */
 
-paddr_t page_translate(vaddr_t vaddr,bool is_write)
+paddr_t page_translate(vaddr_t addr,bool is_write)
 {
-  /*
-  //»ñÈ¡Ò³Ä¿Â¼µÄ»ùµØÖ·
-  paddr_t dir = PTE_ADDR(cpu.cr3.val);
-  //¼ì²éÒ³Ä¿Â¼ÏîµÄpresentÎ»£¬Èç·¢ÏÖÎŞĞ§±íÏî£¬ÔòÖÕÖ¹
-  assert(paddr_read(dir + sizeof(paddr_t) * PDX(vaddr), sizeof(paddr_t)) & PTE_P);
-  //¶ÁÈ¡Ò³±íÏîµÄ»ùµØÖ·
-  paddr_t pg = PTE_ADDR(paddr_read(dir + sizeof(paddr_t) * PDX(vaddr), sizeof(paddr_t)));
-  //¼ì²éÒ³±íÏîµÄpresentÎ»£¬Èç·¢ÏÖÎŞĞ§±íÏî£¬ÔòÖÕÖ¹
-  assert(paddr_read(pg + sizeof(paddr_t) * PTX(vaddr), sizeof(paddr_t)) & PTE_P);
-  //·µ»ØµÄÎïÀíµØÖ·ĞèÒªÏÈ¶ÁÈ¡¶ÔÓ¦Ò³±íÏîËù¼ÇÂ¼µÄÎïÀíµØÖ·£¬ÔÙ¼ÓÉÏÆ«ÒÆÁ¿
-  return (PTE_ADDR(paddr_read(pg + sizeof(paddr_t) * PTX(vaddr), sizeof(paddr_t))) | OFF(vaddr)); 
-  */
- 
- //Ò³Ä¿Â¼
+ /*
+ //é¡µç›®å½•
  PDE pde,*pgdir;
- //Ò³±í
+ //é¡µè¡¨
  PTE pte,*pgtable;
  paddr_t paddr=vaddr;
  if(cpu.cr0.protect_enable&&cpu.cr0.paging){
    //Log("cr0:0x%08x,cr3:0x%08x",cpu.cr0.val,cpu.cr3.val);
    pgdir=(PDE*)(intptr_t)(cpu.cr3.page_directory_base<<12);
    pde.val=paddr_read((intptr_t)&pgdir[(vaddr>>22)&0x3ff],4);
-   assert(pde.present);//¼ì²épresentÎ»
+   assert(pde.present);//æ£€æŸ¥presentä½
    pte.accessed=1;
    pgtable=(PTE*)(intptr_t)(pde.page_frame<<12);
    pte.val=paddr_read((intptr_t)&pgtable[(vaddr>>12)&0x3ff],4);
-   assert(pte.present);//¼ì²épresentÎ»
-   //ÊµÏÖaccessedÎ»ºÍdirtyÎ»
+   assert(pte.present);//æ£€æŸ¥presentä½
+   //å®ç°accessedä½å’Œdirtyä½
    pte.accessed=1;
    pte.dirty=is_write?1:0;
    paddr=(pte.page_frame<<12)|(vaddr&PAGE_MASK);
  }
- return paddr;
-  /*
-  //if (!cpu.cr0.paging) {Log("Paging is 0!");return addr;}
+ return paddr;*/
+  
+  if (!cpu.cr0.paging) {Log("Paging is 0!");return addr;}
   // Log("page_translate: addr: 0x%x\n", addr);
+  //è·å–é¡µç›®å½•é¡¹
   paddr_t dir = (addr >> 22) & 0x3ff;
+  //è·å–é¡µè¡¨é¡¹
   paddr_t page = (addr >> 12) & 0x3ff;
+  //è·å–é¡µåç§»
   paddr_t offset = addr & 0xfff;
+  //è·å–é¡µç›®å½•åŸºå€
   paddr_t PDT_base = cpu.cr3.page_directory_base;
   // Log("page_translate: dir: 0x%x page: 0x%x offset: 0x%x PDT_base: 0x%x\n", dir, page, offset, PDT_base);
   PDE pde;
+  //è¯»å–å¯¹åº”çš„é¡µç›®å½•é¡¹
   pde.val = paddr_read((PDT_base << 12) + (dir << 2), 4);
-  if (!pde.present) {
+  if (!pde.present) {//æ£€æŸ¥pä½
     Log("page_translate: addr: 0x%x\n", addr);
     Log("page_translate: dir: 0x%x page: 0x%x offset: 0x%x PDT_base: 0x%x\n", dir, page, offset, PDT_base);
     assert(pde.present);
   }
   PTE pte;
   // Log("page_translate: page_frame: 0x%x\n", pde.page_frame);
+  //è¯»å–å¯¹åº”çš„é¡µè¡¨é¡¹
   pte.val = paddr_read((pde.page_frame << 12) + (page << 2), 4);
   if (!pte.present) {
     Log("page_translate: addr: 0x%x\n", addr);
     assert(pte.present);
   }
+  Log("pte.val:0x%08x",pte.val);
   paddr_t paddr = (pte.page_frame << 12) | offset;
   // Log("page_translate: paddr: 0x%x\n", paddr);
-  return paddr;*/
+  return paddr;
 }
 
 
@@ -100,12 +95,12 @@ uint32_t paddr_read(paddr_t addr, int len)
 {
   //Log("paddr_read:0x%08x",addr);
   if (is_mmio(addr) == -1)
-  { //Îª-1£¬Ôò²»ÊÇÄÚ´æÓ³ÉäI/OµÄ·ÃÎÊ
+  { //ä¸º-1ï¼Œåˆ™ä¸æ˜¯å†…å­˜æ˜ å°„I/Oçš„è®¿é—®
     return pmem_rw(addr, uint32_t) & (~0u >> ((4 - len) << 3));
   }
   else
   {
-    return mmio_read(addr, len, is_mmio(addr)); //¸ù¾İÓ³ÉäºÅ·ÃÎÊÄÚ´æÓ³ÉäI/O
+    return mmio_read(addr, len, is_mmio(addr)); //æ ¹æ®æ˜ å°„å·è®¿é—®å†…å­˜æ˜ å°„I/O
   }
   //***(4-len)<<3 = (4-len)*2^3,     ~ = take inverse
 }
@@ -133,10 +128,10 @@ bool is_cross_boundry(vaddr_t addr,int len){
 // ***x86 is small end.
 uint32_t vaddr_read(vaddr_t addr, int len)
 {
-  //Èç¹û·¢ÏÖ CR0 µÄ PG Î»Îª 1,Ôò¿ªÆô·ÖÒ³»úÖÆ
+  //å¦‚æœå‘ç° CR0 çš„ PG ä½ä¸º 1,åˆ™å¼€å¯åˆ†é¡µæœºåˆ¶
   if (cpu.cr0.paging)
   {
-    //Êı¾İ¿çÔ½ÁË±ß½ç£¬ÔòÒª½øĞĞÁ½´Î×ª»»
+    //æ•°æ®è·¨è¶Šäº†è¾¹ç•Œï¼Œåˆ™è¦è¿›è¡Œä¸¤æ¬¡è½¬æ¢
     if (OFF(addr) + len > PGSIZE)
     {
       //assert(0);
@@ -145,13 +140,13 @@ uint32_t vaddr_read(vaddr_t addr, int len)
 
       uint32_t first = paddr_read(page_translate(addr,false), firstLen);
       uint32_t second = paddr_read(page_translate(addr + firstLen,false), secondLen);
-      Log("First Add:0x%08x,Second Add:0x%08x",page_translate(addr,false),page_translate(addr + firstLen,false));
-      Log("vaddr:0x%08x,paddr:0x%08x",addr,second << (8 * firstLen) | first);
-      //¶ÔÁ½´Î×ª»»½á¹û½øĞĞÆ´½Ó
+      //Log("First Add:0x%08x,Second Add:0x%08x",page_translate(addr,false),page_translate(addr + firstLen,false));
+      //Log("vaddr:0x%08x,paddr:0x%08x",addr,second << (8 * firstLen) | first);
+      //å¯¹ä¸¤æ¬¡è½¬æ¢ç»“æœè¿›è¡Œæ‹¼æ¥
       return (second << (8 * firstLen)) | first;
     }
     else
-    { //·ñÔòÖ±½Ó×ª»»¾ÍĞĞÁË
+    { //å¦åˆ™ç›´æ¥è½¬æ¢å°±è¡Œäº†
       Log("vaddr:0x%08x,paddr:0x%08x",addr,page_translate(addr,false));
       return paddr_read(page_translate(addr,false), len);
     }
@@ -196,12 +191,12 @@ uint32_t vaddr_read(vaddr_t addr, int len)
 
 void vaddr_write(vaddr_t addr, int len, uint32_t data)
 {
-  // µ±CR0µÄPGÎ»Îª1Ôò¿ªÆô·ÖÒ³Ä£Ê½
+  // å½“CR0çš„PGä½ä¸º1åˆ™å¼€å¯åˆ†é¡µæ¨¡å¼
   if (cpu.cr0.paging)
   {
     if (OFF(addr) + len > PGSIZE)
     {
-      assert(0); //¿çÔ½±ß½ç£¬±¨´í
+      assert(0); //è·¨è¶Šè¾¹ç•Œï¼ŒæŠ¥é”™
     }
     else
     {
