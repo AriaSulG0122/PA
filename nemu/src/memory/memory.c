@@ -79,7 +79,10 @@ uint32_t vaddr_read(vaddr_t addr, int len) {
     data = (paddr_read(paddr,len2) << (len1 << 3)) | data;
     return data;
   }
-  if(cpu.cr0.paging) return paddr_read(page_translate(addr,false), len);
+  if(cpu.cr0.paging) {
+    Log("paddr:0x%08x",page_translate(addr,false));
+    return paddr_read(page_translate(addr,false), len);
+    }
   else return paddr_read(addr, len);
 }
 
