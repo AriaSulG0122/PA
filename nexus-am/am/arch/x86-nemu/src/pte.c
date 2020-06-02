@@ -92,7 +92,7 @@ uint32_t _map(_Protect *p, void *va, void *pa) {
 		basePTE = (PTE*)(basePDE[dir] & 0xfffff000);
 		basePTE[page] = (uint32_t)pa | PTE_P;	
 	}
-  return (uint32_t)basePTE | PTE_P;
+  return (uint32_t)pa | PTE_P;
 }
 
 void _unmap(_Protect *p, void *va) {
