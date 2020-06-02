@@ -157,12 +157,12 @@ uint32_t vaddr_read(vaddr_t addr, int len)
     uint32_t l = paddr_read(page_translate(addr + prev,false), last);
     // Log("vaddr_read: addr: 0x%x prev %d last %d", addr, prev, last);
     uint32_t ret = (l << (8 * prev)) | p; 
-    // Log("vaddr_read: addr: 0x%x p 0x%x l 0x%x res 0x%x", addr, p, l, ret);
+    Log("vaddr_read: addr: 0x%x p 0x%x l 0x%x res 0x%x", addr, p, l, ret);
     return ret;
     assert(0);
   } else {
     paddr_t paddr = page_translate(addr,false);
-    Log("paddr_read: 0x%x", paddr);
+    //Log("paddr_read: 0x%x", paddr);
     return paddr_read(paddr, len);
   }
 }
