@@ -82,7 +82,7 @@ paddr_t page_translate(vaddr_t addr,bool is_write)
    paddr=(pte.page_frame<<12)|(vaddr&PAGE_MASK);
  }
  return paddr;*/
-  if (!cpu.cr0.paging) return addr;
+  if (!cpu.cr0.paging) {Log("Paging is 0!");return addr;}
   // Log("page_translate: addr: 0x%x\n", addr);
   paddr_t dir = (addr >> 22) & 0x3ff;
   paddr_t page = (addr >> 12) & 0x3ff;
