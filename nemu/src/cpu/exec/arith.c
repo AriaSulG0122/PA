@@ -1,12 +1,15 @@
 #include "cpu/exec.h"
 
 make_EHelper(add) {
+  //TODO();
   rtl_add(&t2, &id_dest->val, &id_src->val);
+  rtl_sltu(&t3, &t2, &id_dest->val);
   operand_write(id_dest, &t2);
 
   rtl_update_ZFSF(&t2, id_dest->width);
 
   rtl_sltu(&t0, &t2, &id_dest->val);
+  rtl_or(&t0, &t3, &t0);
   rtl_set_CF(&t0);
 
   rtl_xor(&t0, &id_dest->val, &id_src->val);
@@ -19,15 +22,20 @@ make_EHelper(add) {
   print_asm_template2(add);
 }
 
+//与sbb十分相似，主要区别在于CF位不用处理
 make_EHelper(sub) {
+  //TODO();
   rtl_sub(&t2, &id_dest->val, &id_src->val);
-  operand_write(id_dest, &t2);
+  rtl_sltu(&t3, &id_dest->val, &t2);
 
-  rtl_update_ZFSF(&t2, id_dest->width);
+  operand_write(id_dest, &t2);//完成计算，写入结果
 
+  rtl_update_ZFSF(&t2, id_dest->width);//更新ZF与SF位
+  //设置CF位
   rtl_sltu(&t0, &id_dest->val, &t2);
+  rtl_or(&t0, &t3, &t0);
   rtl_set_CF(&t0);
-
+  //设置OF位
   rtl_xor(&t0, &id_dest->val, &id_src->val);
   rtl_xor(&t1, &id_dest->val, &t2);
   rtl_and(&t0, &t0, &t1);
@@ -38,76 +46,84 @@ make_EHelper(sub) {
 }
 
 make_EHelper(cmp) {
+  //TODO();
   rtl_sub(&t2, &id_dest->val, &id_src->val);
-
-  rtl_update_ZFSF(&t2, id_dest->width);
-
-  rtl_sltu(&t0, &id_dest->val, &t2);
-  rtl_set_CF(&t0);
-
+  rtl_sltu(&t3, &id_dest->val, &t2);
+  
+  rtl_update_ZFSF(&t2, id_dest->width);//更新ZFSF
+  rtl_set_CF(&t3); //设置CF
+  //设置OF位
   rtl_xor(&t0, &id_dest->val, &id_src->val);
   rtl_xor(&t1, &id_dest->val, &t2);
   rtl_and(&t0, &t0, &t1);
   rtl_msb(&t0, &t0, id_dest->width);
   rtl_set_OF(&t0);
-
   print_asm_template2(cmp);
 }
 
 make_EHelper(inc) {
+  //TODO();
   rtl_addi(&t2, &id_dest->val, 1);
-  operand_write(id_dest, &t2);
+  rtl_sltu(&t3, &id_dest->val, &t2);
 
-  rtl_update_ZFSF(&t2, id_dest->width);
+  operand_write(id_dest, &t2);//完成计算，写入结果
 
-  rtl_sltu(&t0, &t2, &id_dest->val);
+  rtl_update_ZFSF(&t2, id_dest->width);//更新ZF与SF位
+  //设置CF位
+  rtl_sltu(&t0, &id_dest->val, &t2);
+  rtl_or(&t0, &t3, &t0);
   rtl_set_CF(&t0);
-
-  rtl_mv(&t0, &id_dest->val);
-  rtl_not(&t0);
+  //设置OF位
+  rtl_xor(&t0, &id_dest->val, &id_src->val);
   rtl_xor(&t1, &id_dest->val, &t2);
   rtl_and(&t0, &t0, &t1);
   rtl_msb(&t0, &t0, id_dest->width);
   rtl_set_OF(&t0);
-
   print_asm_template1(inc);
 }
 
 make_EHelper(dec) {
+  //TODO();
   rtl_subi(&t2, &id_dest->val, 1);
-  operand_write(id_dest, &t2);
+  rtl_sltu(&t3, &id_dest->val, &t2);
 
-  rtl_update_ZFSF(&t2, id_dest->width);
+  operand_write(id_dest, &t2);//完成计算，写入结果
 
+  rtl_update_ZFSF(&t2, id_dest->width);//更新ZF与SF位
+  //设置CF位
   rtl_sltu(&t0, &id_dest->val, &t2);
+  rtl_or(&t0, &t3, &t0);
   rtl_set_CF(&t0);
-
-  rtl_mv(&t0, &id_dest->val);
+  //设置OF位
+  rtl_xor(&t0, &id_dest->val, &id_src->val);
   rtl_xor(&t1, &id_dest->val, &t2);
   rtl_and(&t0, &t0, &t1);
   rtl_msb(&t0, &t0, id_dest->width);
   rtl_set_OF(&t0);
-
   print_asm_template1(dec);
 }
 
 make_EHelper(neg) {
-  if(id_dest->val == 0){
-  	rtl_set_CF(&tzero);
+  //TODO();
+  if(id_dest->val==0){//IF r/m == 0
+    rtl_set_CF(&tzero);//CF=0
   }
   else{
-	rtl_addi(&t0, &tzero, 1);
-	rtl_set_CF(&t0);
+    rtl_addi(&t2,&tzero,1);
+    rtl_set_CF(&t2);//CF=1
   }
-  rtl_mv(&t2, &id_dest->val);
-  t2 = -t2;
-  operand_write(id_dest, &t2);
-
+  rtl_mv(&t2,&tzero);//t2=0
+  rtl_sub(&t2,&tzero,&id_dest->val);//t2=0-r/m=-r/m
+  operand_write(id_dest,&t2);
+  //更新ZF与SF位
   rtl_update_ZFSF(&t2, id_dest->width);
-
-  rtl_eqi(&t0, &id_dest->val, -2147483648);
+  //设置OF位
+  rtl_xor(&t0, &id_dest->val, &id_src->val);
+  rtl_xor(&t1, &id_dest->val, &t2);
+  rtl_and(&t0, &t0, &t1);
+  rtl_msb(&t0, &t0, id_dest->width);
   rtl_set_OF(&t0);
-
+  
   print_asm_template1(neg);
 }
 
@@ -137,16 +153,18 @@ make_EHelper(adc) {
 make_EHelper(sbb) {
   rtl_sub(&t2, &id_dest->val, &id_src->val);
   rtl_sltu(&t3, &id_dest->val, &t2);
+  //处理CF位
   rtl_get_CF(&t1);
   rtl_sub(&t2, &t2, &t1);
-  operand_write(id_dest, &t2);
 
-  rtl_update_ZFSF(&t2, id_dest->width);
+  operand_write(id_dest, &t2);//完成计算，写入结果
 
+  rtl_update_ZFSF(&t2, id_dest->width);//更新ZF与SF位
+  //设置CF位
   rtl_sltu(&t0, &id_dest->val, &t2);
   rtl_or(&t0, &t3, &t0);
   rtl_set_CF(&t0);
-
+  //设置OF位
   rtl_xor(&t0, &id_dest->val, &id_src->val);
   rtl_xor(&t1, &id_dest->val, &t2);
   rtl_and(&t0, &t0, &t1);

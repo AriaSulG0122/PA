@@ -22,25 +22,28 @@ make_EHelper(jmp_rm) {
 
   print_asm("jmp *%s", id_dest->str);
 }
-/**
-* 2020/3/22 1711355 Zhongyu-Li
-**/
+
 make_EHelper(call) {
   // the target address is calculated at the decode stage
+  //TODO();
+  decoding.is_jmp=1;//This is jump instruction
   rtl_push(eip);
-  decoding.is_jmp = 1;
+
   print_asm("call %x", decoding.jmp_eip);
 }
 
 make_EHelper(ret) {
-  rtl_pop(&decoding.jmp_eip);
-  decoding.is_jmp = 1;
+  //TODO();
+  rtl_pop(&decoding.jmp_eip);//取出栈顶保存的eip值，然后将其设置为跳转的eip值
+  decoding.is_jmp=1;//指令跳转为真
   print_asm("ret");
 }
 
+//参考jmp_rm和call
 make_EHelper(call_rm) {
-  decoding.jmp_eip = id_dest->val;
-  decoding.is_jmp = 1;
+  //TODO();
+  decoding.is_jmp=1;//This is jump instruction
   rtl_push(eip);
+  decoding.jmp_eip = id_dest->val;
   print_asm("call *%s", id_dest->str);
 }
