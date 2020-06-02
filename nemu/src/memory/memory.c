@@ -68,14 +68,15 @@ paddr_t page_translate(vaddr_t vaddr,bool is_write)
  PTE pte,*pgtable;
  paddr_t paddr=vaddr;
  if(cpu.cr0.protect_enable&&cpu.cr0.paging){
-   Log("cr0:0x%08x,cr3:0x%08x",cpu.cr0.val,cpu.cr3.val);
+   //Log("cr0:0x%08x,cr3:0x%08x",cpu.cr0.val,cpu.cr3.val);
    pgdir=(PDE*)(intptr_t)(cpu.cr3.page_directory_base<<12);
    pde.val=paddr_read((intptr_t)&pgdir[(vaddr>>22)&0x3ff],4);
-   assert(pde.present);
+   assert(pde.present);//检查present位
    pte.accessed=1;
    pgtable=(PTE*)(intptr_t)(pde.page_frame<<12);
    pte.val=paddr_read((intptr_t)&pgtable[(vaddr>>12)&0x3ff],4);
-   assert(pte.present);
+   assert(pte.present);//检查present位
+   //实现accessed位和dirty位
    pte.accessed=1;
    pte.dirty=is_write?1:0;
    paddr=(pte.page_frame<<12)|(vaddr&PAGE_MASK);
@@ -122,7 +123,7 @@ uint32_t vaddr_read(vaddr_t addr, int len)
     }
     else
     { //否则直接转换就行了
-      Log("vaddr:0x%08x,paddr:0x%08x",addr,page_translate(addr,false));
+      //Log("vaddr:0x%08x,paddr:0x%08x",addr,page_translate(addr,false));
       return paddr_read(page_translate(addr,false), len);
     }
   }
