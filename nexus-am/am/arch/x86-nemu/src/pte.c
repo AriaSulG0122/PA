@@ -89,7 +89,7 @@ void _map(_Protect *p, void *va, void *pa,void* mydata) {
   }
   //设置页表项中物理页的映射关系，同时设置P位
   pgtable[PTX(va)]=PTE_ADDR(pa)|PTE_P;
-  mydata=pa;
+  mydata=&pa;
 }
 
 void _unmap(_Protect *p, void *va) {
