@@ -19,7 +19,7 @@ void free_page(void *p)
 /* The brk() system call handler. */
 int mm_brk(uint32_t new_brk)
 {
-
+  /*
   if (current->cur_brk == 0)
   {
     current->cur_brk = current->max_brk = new_brk;
@@ -28,23 +28,16 @@ int mm_brk(uint32_t new_brk)
   {
     if (new_brk > current->max_brk)
     {//将[current->max_brk,new_brk)的空间映射到地址空间current->as
-      /*
       uintptr_t page_start = PGROUNDUP(current->max_brk);
       uintptr_t page_end = PGROUNDUP(new_brk);
       for (; page_start <= page_end; page_start += PGSIZE) {
         _map(&current->as, (void *)page_start, new_page());
-        */
-       int size = new_brk - current->max_brk;
-      void *page;
-      void* va = (void*)PGROUNDUP(current->max_brk); 
-      for(int i=0;i<size;i+=PGSIZE){
-        page = (void*)new_page();
-        _map(&current->as, va + i, page);
       }
       current->max_brk = new_brk;
     }
     current->cur_brk = new_brk;
   }
+  */
   return 0;
 }
 
