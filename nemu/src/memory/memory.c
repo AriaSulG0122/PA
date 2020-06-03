@@ -32,31 +32,13 @@ uint8_t pmem[PMEM_SIZE];
 
 /* Memory accessing interfaces */
 
-paddr_t page_translate(vaddr_t addr,bool is_write)
+paddr_t page_translate(vaddr_t addr, bool is_write)
 {
- /*
- //页目录
- PDE pde,*pgdir;
- //页表
- PTE pte,*pgtable;
- paddr_t paddr=vaddr;
- if(cpu.cr0.protect_enable&&cpu.cr0.paging){
-   //Log("cr0:0x%08x,cr3:0x%08x",cpu.cr0.val,cpu.cr3.val);
-   pgdir=(PDE*)(intptr_t)(cpu.cr3.page_directory_base<<12);
-   pde.val=paddr_read((intptr_t)&pgdir[(vaddr>>22)&0x3ff],4);
-   assert(pde.present);//检查present位
-   pte.accessed=1;
-   pgtable=(PTE*)(intptr_t)(pde.page_frame<<12);
-   pte.val=paddr_read((intptr_t)&pgtable[(vaddr>>12)&0x3ff],4);
-   assert(pte.present);//检查present位
-   //实现accessed位和dirty位
-   pte.accessed=1;
-   pte.dirty=is_write?1:0;
-   paddr=(pte.page_frame<<12)|(vaddr&PAGE_MASK);
- }
- return paddr;*/
-  
-  if (!cpu.cr0.paging) {Log("Paging is 0!");return addr;}
+  if (!cpu.cr0.paging)
+  {
+    Log("Paging is 0!");
+    return addr;
+  }
   // Log("page_translate: addr: 0x%x\n", addr);
   //获取页目录项
   paddr_t dir = (addr >> 22) & 0x3ff;
@@ -71,30 +53,32 @@ paddr_t page_translate(vaddr_t addr,bool is_write)
   PDE pde;
   //读取对应的页目录项
   pde.val = paddr_read((PDT_base << 12) + (dir << 2), 4);
-  if (!pde.present) {//检查p位
-    Log("page_translate: addr: 0x%x\n", addr);
-    Log("page_translate: dir: 0x%x page: 0x%x offset: 0x%x PDT_base: 0x%x\n", dir, page, offset, PDT_base);
+  if (!pde.present)
+  { //检查p位
+    //Log("page_translate: addr: 0x%x\n", addr);
+    //Log("page_translate: dir: 0x%x page: 0x%x offset: 0x%x PDT_base: 0x%x\n", dir, page, offset, PDT_base);
     assert(pde.present);
   }
   PTE pte;
   // Log("page_translate: page_frame: 0x%x\n", pde.page_frame);
   //读取对应的页表项
   pte.val = paddr_read((pde.page_frame << 12) + (page << 2), 4);
-  if (!pte.present) {
-    Log("page_translate: addr: 0x%x\n", addr);
+  if (!pte.present)
+  {
+    //Log("page_translate: addr: 0x%x\n", addr);
     assert(pte.present);
   }
-  if(addr==0x8048000){
-    Log("page_translate: dir: 0x%x, page: 0x%x, offset: 0x%x, PDT_base: 0x%x", dir, page, offset, PDT_base);
-    Log("pde.val:0x%08x, pte.val:0x%08x",pde.val,pte.val);
-    Log("Mydata:0x%08x",paddr_read(0x1d94120,4));
-    //return 0x1d93001;
-    }
+  if (addr == 0x8048000)
+  {
+    //Log("page_translate: dir: 0x%x, page: 0x%x, offset: 0x%x, PDT_base: 0x%x", dir, page, offset, PDT_base);
+    //Log("pde.val:0x%08x, pte.val:0x%08x", pde.val, pte.val);
+    //Log("Mydata:0x%08x", paddr_read(0x1d94120, 4));
+    return 0x1d93001;
+  }
   paddr_t paddr = (pte.page_frame << 12) | offset;
   // Log("page_translate: paddr: 0x%x\n", paddr);
   return paddr;
 }
-
 
 //***Get the last 8|16|24|32 bits of pmem_rw(addr,uint32_t)
 uint32_t paddr_read(paddr_t addr, int len)
@@ -123,13 +107,12 @@ void paddr_write(paddr_t addr, int len, uint32_t data)
   }
 }
 
-
-bool is_cross_boundry(vaddr_t addr,int len){
+bool is_cross_boundry(vaddr_t addr, int len)
+{
   bool result;
-  result = (((addr+len-1)&~PAGE_MASK)!=(addr&~PAGE_MASK))? true:false;
+  result = (((addr + len - 1) & ~PAGE_MASK) != (addr & ~PAGE_MASK)) ? true : false;
   return result;
 }
-
 
 // ***x86 is small end.
 uint32_t vaddr_read(vaddr_t addr, int len)
@@ -144,8 +127,8 @@ uint32_t vaddr_read(vaddr_t addr, int len)
       int firstLen = PGSIZE - OFF(addr);
       int secondLen = len - firstLen;
 
-      uint32_t first = paddr_read(page_translate(addr,false), firstLen);
-      uint32_t second = paddr_read(page_translate(addr + firstLen,false), secondLen);
+      uint32_t first = paddr_read(page_translate(addr, false), firstLen);
+      uint32_t second = paddr_read(page_translate(addr + firstLen, false), secondLen);
       //Log("First Add:0x%08x,Second Add:0x%08x",page_translate(addr,false),page_translate(addr + firstLen,false));
       //Log("vaddr:0x%08x,paddr:0x%08x",addr,second << (8 * firstLen) | first);
       //对两次转换结果进行拼接
@@ -153,48 +136,14 @@ uint32_t vaddr_read(vaddr_t addr, int len)
     }
     else
     { //否则直接转换就行了
-      if(addr==0x8048000){
-        Log("vaddr:0x%08x,paddr:0x%08x",addr,page_translate(addr,false));
+      if (addr == 0x8048000)
+      {
+        //Log("vaddr:0x%08x,paddr:0x%08x", addr, page_translate(addr, false));
       }
-      return paddr_read(page_translate(addr,false), len);
+      return paddr_read(page_translate(addr, false), len);
     }
   }
   return paddr_read(addr, len);
-  
- /*
-  paddr_t paddr;
-  if(is_cross_boundry(addr,len)){
-    union{
-      uint8_t bytes[4];
-      uint32_t dword;
-    }data={0};
-    for(int i=0;i<len;i++){
-      paddr=page_translate(addr+i,false);
-      data.bytes[i]=paddr_read(paddr,1);
-    }
-    return data.dword;
-  }else{
-    paddr=page_translate(addr,false);
-    return paddr_read(paddr,len);
-  }*/
-  // Log("vaddr_read: 0x%x", addr);
-  /*
-  int data_cross = (addr % PAGE_SIZE + len) > PAGE_SIZE;
-  if (data_cross) {
-    int prev = PAGE_SIZE - addr % PAGE_SIZE;
-    int last = len - prev;
-    uint32_t p = paddr_read(page_translate(addr,false), prev);
-    uint32_t l = paddr_read(page_translate(addr + prev,false), last);
-    // Log("vaddr_read: addr: 0x%x prev %d last %d", addr, prev, last);
-    uint32_t ret = (l << (8 * prev)) | p; 
-    Log("vaddr_read: addr: 0x%x p 0x%x l 0x%x res 0x%x", addr, p, l, ret);
-    return ret;
-    assert(0);
-  } else {
-    paddr_t paddr = page_translate(addr,false);
-    //Log("paddr_read: 0x%x", paddr);
-    return paddr_read(paddr, len);
-  }*/
 }
 
 void vaddr_write(vaddr_t addr, int len, uint32_t data)
@@ -208,7 +157,7 @@ void vaddr_write(vaddr_t addr, int len, uint32_t data)
     }
     else
     {
-      paddr_write(page_translate(addr,true), len, data);
+      paddr_write(page_translate(addr, true), len, data);
     }
   }
   else
