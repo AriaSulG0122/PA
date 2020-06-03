@@ -1,4 +1,4 @@
-﻿#include "common.h"
+#include "common.h"
 
 #define DEFAULT_ENTRY ((void *)0x8048000)
 
@@ -29,10 +29,13 @@ uintptr_t loader(_Protect *as, const char *filename) {
   
   //读取文件长度
   size_t len=fs_filesz(fd);
-  //读取文件末尾位置
+  //文件末尾位置
   void* end=DEFAULT_ENTRY+len;
   //输出日志信息
   Log("load file:%s,fd:%d,size:%d\n",filename,fd,len);
+  
+  //从文件头部开始读取，每次读取一页的大小到相应的物理地址
+  //需要通过map维护好页表的映射关系
   for(void* va=DEFAULT_ENTRY;va<end;va+=PGSIZE){
     //从堆区获取新的物理页
     void* pa=new_page();
@@ -42,7 +45,8 @@ uintptr_t loader(_Protect *as, const char *filename) {
     mydata=_map(as,va,pa);
     Log("MyData:0x%08x",mydata);
     Log("PDT_Base:0x%08x",as->ptr);
-    //读取文件，读取长度不能超过页的大小
+    //fs_read(fd,pa,(pa-va)<PGSIZE?(end-va):PGSIZE);
+    //读取文件
     fs_read(fd,pa,(end-va)<PGSIZE?(end-va):PGSIZE);
   }
   
