@@ -48,7 +48,8 @@ uintptr_t loader(_Protect *as, const char *filename) {
     //Log("PDT_Base:0x%08x",as->ptr);
     //fs_read(fd,pa,(pa-va)<PGSIZE?(end-va):PGSIZE);
     //读取文件
-    fs_read(fd,pa,(end-va)<PGSIZE?(end-va):PGSIZE);
+    //fs_read(fd,pa,(end-va)<PGSIZE?(end-va):PGSIZE);
+    fs_read(fd,pa,PGSIZE);
   }
   
 
