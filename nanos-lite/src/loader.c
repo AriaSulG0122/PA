@@ -41,10 +41,10 @@ uintptr_t loader(_Protect *as, const char *filename) {
     void* pa=new_page();
     //将虚拟页映射到获取到的物理页
     Log("Map va:0x%08x to pa:0x%08x",va,pa);
-    //_map(as,va,pa);
-    uint32_t mydata=_map(as,va,pa);
-    Log("MyData:0x%08x",mydata);
-    Log("PDT_Base:0x%08x",as->ptr);
+    _map(as,va,pa);
+    //uint32_t mydata=_map(as,va,pa);
+    //Log("MyData:0x%08x",mydata);
+    //Log("PDT_Base:0x%08x",as->ptr);
     //fs_read(fd,pa,(pa-va)<PGSIZE?(end-va):PGSIZE);
     //读取文件
     fs_read(fd,pa,(end-va)<PGSIZE?(end-va):PGSIZE);
