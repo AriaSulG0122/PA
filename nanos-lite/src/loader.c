@@ -1,4 +1,4 @@
-#include "common.h"
+﻿#include "common.h"
 
 #define DEFAULT_ENTRY ((void *)0x8048000)
 
@@ -43,7 +43,7 @@ uintptr_t loader(_Protect *as, const char *filename) {
     Log("MyData:0x%08x",mydata);
     Log("PDT_Base:0x%08x",as->ptr);
     //读取文件，读取长度不能超过页的大小
-    fs_read(fd,pa,(pa-va)<PGSIZE?(end-va):PGSIZE);
+    fs_read(fd,pa,PGSIZE);
   }
   
 
