@@ -34,7 +34,7 @@ int main() {
   //实现文件系统后，更换用户程序只需要修改传入loader()函数的文件名即可
   //uint32_t entry = loader(NULL, "/bin/events");//调用loader来加载用户程序，函数返回用户程序的入口地址
   //((void (*)(void))entry)();//跳转至入口地址执行
-  load_prog("/bin/hello");
+  load_prog("/bin/pal");
 
   panic("Should not reach here");
 }
