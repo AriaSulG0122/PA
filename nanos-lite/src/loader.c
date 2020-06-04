@@ -26,7 +26,7 @@ uintptr_t loader(_Protect *as, const char *filename) {
   fs_read(fd,DEFAULT_ENTRY,fs_filesz(fd));
   printf("Load file:%d",fd);
   */
-  
+  /*
   //读取文件长度
   size_t len=fs_filesz(fd);
   //文件末尾位置
@@ -49,8 +49,15 @@ uintptr_t loader(_Protect *as, const char *filename) {
     //读取文件
     fs_read(fd,pa,(end-va)<PGSIZE?(end-va):PGSIZE);
   }
-  
+  */
+  int size = fs_filesz(fd);
+  void *page;
 
+  for(int i=0;i<size;i+=PGSIZE){
+	page = (void*)new_page();
+	_map(as, DEFAULT_ENTRY + i, page);
+	fs_read(fd, page, PGSIZE);
+  }
   fs_close(fd);
   return (uintptr_t)DEFAULT_ENTRY;
 }
