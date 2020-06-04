@@ -230,7 +230,12 @@ make_EHelper(real) {
 static inline void update_eip(void) {//如果要跳转(decoing.is_jmp=1)，首先初始化跳转指令，再跳(eip=decoing.jmp_eip)；
                                      //否则顺序执行(eip=decoing.seq_eip)
   cpu.eip = (decoding.is_jmp ? (decoding.is_jmp = 0, decoding.jmp_eip) : decoding.seq_eip);
-  printf("jmp eip:0x%08x",decoding.jmp_eip);
+  if(decoding.is_jmp){
+    printf("jmp eip:0x%08x\n",decoding.jmp_eip);
+  }else{
+    printf("seq eip:0x%08x\n",decoding.seq_eip);
+  }
+  
 }
 
 //***exec current eip instruction and then update eip
