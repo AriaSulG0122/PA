@@ -1,4 +1,4 @@
-﻿#include "common.h"
+#include "common.h"
 
 /* Uncomment these macros to enable corresponding functionality. */
 #define HAS_ASYE  //Asynchronous Extension，异步处理拓展
@@ -35,6 +35,8 @@ int main() {
   //uint32_t entry = loader(NULL, "/bin/events");//调用loader来加载用户程序，函数返回用户程序的入口地址
   //((void (*)(void))entry)();//跳转至入口地址执行
   load_prog("/bin/pal");
+
+  _trap();//内核自陷
 
   panic("Should not reach here");
 }
