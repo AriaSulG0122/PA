@@ -27,17 +27,27 @@ void load_prog(const char *filename) {
   pcb[i].tf = _umake(&pcb[i].as, stack, stack, (void *)entry, NULL, NULL);
 }
 
+static int count=0;
 //用于返回将要调度的进程的上下文
 _RegSet* schedule(_RegSet *prev) {
   //return NULL;
   //save the context pointer
   current->tf=prev;
   //always select pcb[0] as the new process
+  
   //current=&pcb[0];
   
   //take turn to run two process
-  current=(current==&pcb[0]?&pcb[1]:&pcb[0]);
+  //current=(current==&pcb[0]?&pcb[1]:&pcb[0]);
   
+  //priority
+  count++;
+  if(count%20==0){
+    current=&pcb[1];
+  }else{
+    current=&pcb[0];
+  }
+
   //TODO:switch to the new address spcae
   //then return the new context
   _switch(&current->as);
