@@ -26,6 +26,15 @@ void load_prog(const char *filename) {
   pcb[i].tf = _umake(&pcb[i].as, stack, stack, (void *)entry, NULL, NULL);
 }
 
+//用于返回将要调度的进程的上下文
 _RegSet* schedule(_RegSet *prev) {
-  return NULL;
+  //return NULL;
+  //save the context pointer
+  current->tf=prev;
+  //always select pcb[0] as the new process
+  current=&pcb[0];
+  //TODO:switch to the new address spcae
+  //then return the new context
+  _switch(&current->as);
+  return current->tf;
 }

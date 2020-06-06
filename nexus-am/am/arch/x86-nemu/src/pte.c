@@ -98,6 +98,15 @@ uint32_t _map(_Protect *p, void *va, void *pa) {
 void _unmap(_Protect *p, void *va) {
 }
 
+//在ustack的底部初始化一个以entry为返回地址的陷阱帧
 _RegSet *_umake(_Protect *p, _Area ustack, _Area kstack, void *entry, char *const argv[], char *const envp[]) {
-  return NULL;
+  uint32_t *stack=(uint32_t*)(ustack.end-4);
+  for(int i=0;i<3;i++){
+    *stack--=0;
+  }
+  _RegSet* tf=(void *)(stack-sizeof(_RegSet));
+  tf->eflags=0x2|(1<<9);
+  tf->cs=8;
+  tf->eip=(uintptr_t)entry;
+  return tf;
 }
