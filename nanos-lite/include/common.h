@@ -10,5 +10,5 @@ typedef char bool;
 #define false 0
 
 _RegSet* do_syscall(_RegSet *r);
-
+_RegSet* schedule(_RegSet *prev);
 #endif
