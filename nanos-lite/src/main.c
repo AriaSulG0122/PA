@@ -35,7 +35,7 @@ int main() {
   //uint32_t entry = loader(NULL, "/bin/events");//调用loader来加载用户程序，函数返回用户程序的入口地址
   //((void (*)(void))entry)();//跳转至入口地址执行
   load_prog("/bin/pal");
-
+  load_prog("/bin/hello");
   _trap();//内核自陷
 
   panic("Should not reach here");
