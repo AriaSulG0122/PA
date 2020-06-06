@@ -102,10 +102,10 @@ void _unmap(_Protect *p, void *va) {
 _RegSet *_umake(_Protect *p, _Area ustack, _Area kstack, void *entry, char *const argv[], char *const envp[]) {
   uint32_t *stack=(uint32_t*)(ustack.end-4);
   for(int i=0;i<3;i++){
-    *stack--=0;
+    *(stack--)=0;
   }
   _RegSet* tf=(void *)(stack-sizeof(_RegSet));
-  tf->eflags=0x2|(1<<9);
+  tf->eflags=0x202;
   tf->cs=8;
   tf->eip=(uintptr_t)entry;
   return tf;
