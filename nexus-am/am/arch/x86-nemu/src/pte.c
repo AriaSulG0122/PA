@@ -14,7 +14,6 @@ _Area segments[] = {      // Kernel memory mappings
 #define NR_KSEG_MAP (sizeof(segments) / sizeof(segments[0]))
 
 void _pte_init(void* (*palloc)(), void (*pfree)(void*)) {
-  //需要提供物理页的分配和回收两个回调函数，用于从AM中获取/释放物理页
   palloc_f = palloc;
   pfree_f = pfree;
 
@@ -24,7 +23,7 @@ void _pte_init(void* (*palloc)(), void (*pfree)(void*)) {
   for (i = 0; i < NR_PDE; i ++) {
     kpdirs[i] = 0;
   }
-  //填写内核的页目录和页表
+
   PTE *ptab = kptabs;
   for (i = 0; i < NR_KSEG_MAP; i ++) {
     uint32_t pdir_idx = (uintptr_t)segments[i].start / (PGSIZE * NR_PTE);
@@ -42,9 +41,8 @@ void _pte_init(void* (*palloc)(), void (*pfree)(void*)) {
       }
     }
   }
-  //设置CR3寄存器
+
   set_cr3(kpdirs);
-  //通过设置CR0寄存器来开启分页机制
   set_cr0(get_cr0() | CR0_PG);
 }
 
@@ -67,46 +65,43 @@ void _switch(_Protect *p) {
   set_cr3(p->ptr);
 }
 
-//将虚拟地址空间p中的虚拟地址va映射到物理地址pa
-uint32_t _map(_Protect *p, void *va, void *pa) {
-  
-  void* addrPDE = p->ptr;
-  //获取页目录基地址
+void _map(_Protect *p, void *va, void *pa) {
+	void* addrPDE = p->ptr;
 	PDE* basePDE = (PDE*) addrPDE;
-	//目录项
+	
 	uint32_t dir = PDX(va);
-  //页表项
 	uint32_t page = PTX(va);
-  PTE* basePTE;
-	if(!(basePDE[dir] & 0x1)){//不存在页目录项
-    //分配页表空间
-		basePTE = (PTE*)palloc_f();
-    //找到页目录项，赋予值
+	if(!(basePDE[dir] & 0x1)){
+		PTE* basePTE = (PTE*)palloc_f();
 		basePDE[dir] = (uint32_t)basePTE | PTE_P;
-    //找到页表基址
 		basePTE = (PTE*)(basePDE[dir] & 0xfffff000);
-    //设置页表项的值
 		basePTE[page] = (uint32_t)pa | PTE_P;
 	}
-	else{//存在页目录项
-		basePTE = (PTE*)(basePDE[dir] & 0xfffff000);
+	else{
+		PTE* basePTE = (PTE*)(basePDE[dir] & 0xfffff000);
 		basePTE[page] = (uint32_t)pa | PTE_P;	
 	}
-  return (basePDE[dir] & 0xfffff000)+page*4;
 }
 
 void _unmap(_Protect *p, void *va) {
 }
 
-//在ustack的底部初始化一个以entry为返回地址的陷阱帧
 _RegSet *_umake(_Protect *p, _Area ustack, _Area kstack, void *entry, char *const argv[], char *const envp[]) {
-  uint32_t *stack=(uint32_t*)(ustack.end-4);
-  for(int i=0;i<3;i++){
-    *(stack--)=0;
-  }
-  _RegSet* tf=(void *)(stack-sizeof(_RegSet));
-  tf->eflags=0x202;
-  tf->cs=8;
-  tf->eip=(uintptr_t)entry;
+	uint32_t* ptr = (uint32_t*)(ustack.end-4);
+	*(ptr--)=0;
+	*(ptr--)=0;
+	*(ptr--)=0;
+	*(ptr--)=0;
+
+	_RegSet* tf = (void*)(ptr-sizeof(_RegSet));
+	tf->eflags = 0x202;
+	tf->cs=8;
+	tf->eip=(uintptr_t)entry;
+	
   return tf;
 }
+
+
+
+
+

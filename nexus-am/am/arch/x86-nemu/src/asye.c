@@ -6,6 +6,7 @@ static _RegSet* (*H)(_Event, _RegSet*) = NULL;
 void vecsys();
 void vecnull();
 void vectrap();
+void vectime();
 
 _RegSet* irq_handle(_RegSet *tf) {
   _RegSet *next = tf;
@@ -14,6 +15,7 @@ _RegSet* irq_handle(_RegSet *tf) {
     switch (tf->irq) {
       case 0x80: ev.event = _EVENT_SYSCALL; break;
       case 0x81: ev.event = _EVENT_TRAP; break;
+      case 0x20: ev.event = _EVENT_IRQ_TIME; break;
       default: ev.event = _EVENT_ERROR; break;
     }
 
@@ -28,7 +30,6 @@ _RegSet* irq_handle(_RegSet *tf) {
 
 static GateDesc idt[NR_IRQ];
 
-//初始化IDT并注册一个事件处理函数
 void _asye_init(_RegSet*(*h)(_Event, _RegSet*)) {
   // initialize IDT
   for (unsigned int i = 0; i < NR_IRQ; i ++) {
@@ -38,8 +39,8 @@ void _asye_init(_RegSet*(*h)(_Event, _RegSet*)) {
   // -------------------- system call --------------------------
   idt[0x80] = GATE(STS_TG32, KSEL(SEG_KCODE), vecsys, DPL_USER);
   idt[0x81] = GATE(STS_TG32, KSEL(SEG_KCODE), vectrap, DPL_USER);
-
-  set_idt(idt, sizeof(idt));//设置idt得首地址和长度
+  idt[0x20] = GATE(STS_TG32, KSEL(SEG_KCODE), vectime, DPL_USER);
+  set_idt(idt, sizeof(idt));
 
   // register event handler
   H = h;
@@ -50,8 +51,7 @@ _RegSet *_make(_Area stack, void *entry, void *arg) {
 }
 
 void _trap() {
-  //内核自陷通过int $0x81触发
-  asm volatile("int $0x81");
+	asm volatile("int $0x81");
 }
 
 int _istatus(int enable) {
