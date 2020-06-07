@@ -3,27 +3,36 @@
 #include <assert.h>
 
 FLOAT F_mul_F(FLOAT a, FLOAT b) {
-  return ((uint64_t)a * (uint64_t)b) >> 16;
+  //相乘后，需要扩大位数为64位无浮点数
+  uint64_t result=(uint64_t)a*(uint64_t)b;
+  //在FLOAT类型下，还需要将结果除以2^16
+  result=result>>16;
+  return result;
 }
 
 FLOAT F_div_F(FLOAT a, FLOAT b) {
+  //先获取符号位
   int sign = (a ^ b) & 0x80000000;
-  a = a < 0 ? -a : a;
-  b = b < 0 ? -b : b;
-  int res = a / b;
-  int c = a % b;
-
-  for(int i=0; i < 16; i++){
-	res <<= 1;
-	c <<= 1;
-	if(c >= b){
-		c -= b;
-		res += 1;
-	}
+  //若ab为负数，则取正数部分
+  if(a<0){
+    a=-a;
   }
-  return sign ? -res : res;
+  if(b<-){
+    b=-b;
+  }
+  //获取整数和余数
+  int round = a / b,remain = a % b;
+  //在FLOAT类型下，还需要将结果乘以2^16
+  round<<16;
+  remain<<16;
+  round+=remain / b;
+  //结果考虑符号位
+  int result=round;
+  if(sign){result=-result;}
+  return result;
 }
 
+//float to FLOAT
 FLOAT f2F(float a) {
   /* You should figure out how to convert `a' into FLOAT without
    * introducing x87 floating point instructions. Else you can
@@ -34,20 +43,24 @@ FLOAT f2F(float a) {
    * stack. How do you retrieve it to another variable without
    * performing arithmetic operations on it directly?
    */
-
+  //类型转换
 	uint32_t* f = (uint32_t*)&a;
-	uint32_t sign = (*f >> 31) & 0x1;
-	uint32_t uexp = (*f >> 23) & 0xff;
-	uint32_t frac = (*f & 0x7fffff) | (1 << 23);
-	int exp = uexp - 127;
+  //符号
+	uint32_t sign = (*f) & 0x80000000;
+	//移码
+  uint32_t transcoding = (*f) & 0x7f000000;
+  //小数部分
+	uint32_t decimal = ((*f) & 0x7fffff) | 0x800000;
+	//移码减127作为指数
+  int exp = transcoding - 127;
 
 	uint32_t res;
 	
 	if(exp > 7 && exp < 15){
-		res = frac << (exp - 7);
+		res = decimal << (exp - 7);
 	}
 	else if(exp < 7 && exp > -17){
-		res = frac >> (7 - exp);
+		res = decimal >> (7 - exp);
 	}
 	else{
 		assert(0);
@@ -55,6 +68,7 @@ FLOAT f2F(float a) {
 	return (sign) ? -res : res;
 }
 
+//取绝对值
 FLOAT Fabs(FLOAT a) {
   return a < 0 ? -a : a; 
 }
