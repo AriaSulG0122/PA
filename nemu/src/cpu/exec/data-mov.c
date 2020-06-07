@@ -5,35 +5,46 @@ make_EHelper(mov) {
   print_asm_template2(mov);
 }
 
-make_EHelper(push) {
-  //TODO();
-  //rtl_push(&id_dest->val);//把value值push到栈顶
-  if (id_dest->width == 1) {
-    id_dest->val = (int32_t)(int8_t)id_dest->val;
+make_EHelper(movs) {
+  Log("movs");
+  rtl_lr(&t0, 4, R_ESI);
+  rtl_lm(&t1, &t0, 1);
+  t0 += 1;
+  rtl_sr(R_ESI, 4, &t0);
+
+  rtl_lr(&t0, 4, R_EDI);
+  rtl_sm(&t0, 1, &t1);
+  t0 += 1;
+  rtl_sr(R_EDI, 4, &t0);
+
+  print_asm_template1(movs);
+}
+
+
+make_EHelper(push){
+  if(id_dest->type==OP_TYPE_IMM && id_dest->width==1){
+	rtl_sext(&id_dest->val, &id_dest->val, 1);
+  }
+  else if(id_dest->type==OP_TYPE_IMM && id_dest->width==2){
+	rtl_sext(&id_dest->val, &id_dest->val, 2);
   }
   rtl_push(&id_dest->val);
   print_asm_template1(push);
 }
 
 make_EHelper(pop) {
-  //TODO();
-  //rtl_pop(&id_dest->val);//不能这么写！
-  /* 调用rtl_pop()取出一个32位值到临时寄存器 */
-  rtl_pop(&t2);
-  /* 使用operand_write()将取出的临时值写入目标寄存器 */
-  operand_write(id_dest,&t2);
+  rtl_pop(&id_src->val);
+  operand_write(id_dest, &id_src->val);
   print_asm_template1(pop);
 }
 
-//把通用寄存器的值压入堆栈
 make_EHelper(pusha) {
-  //TODO();
-  t0=cpu.esp;
+  rtl_li(&t2, cpu.esp);
   rtl_push(&cpu.eax);
   rtl_push(&cpu.ecx);
   rtl_push(&cpu.edx);
   rtl_push(&cpu.ebx);
-  rtl_push(&t0);
+  rtl_push(&t2);
   rtl_push(&cpu.ebp);
   rtl_push(&cpu.esi);
   rtl_push(&cpu.edi);
@@ -41,51 +52,125 @@ make_EHelper(pusha) {
 }
 
 make_EHelper(popa) {
-  //TODO();
-  rtl_pop(&cpu.edi);
-  rtl_pop(&cpu.esi);
-  rtl_pop(&cpu.ebp);
-  rtl_pop(&t0);//Skip ESP
-  rtl_pop(&cpu.ebx);
-  rtl_pop(&cpu.edx);
-  rtl_pop(&cpu.ecx);
-  rtl_pop(&cpu.eax);
+  if(decoding.is_operand_size_16){
+	rtl_pop(&t1);
+	t1 &= 0xffff;
+	rtl_sr_w(R_DI, &t1);
+
+	rtl_pop(&t1);
+	t1 &= 0xffff;
+	rtl_sr_w(R_SI, &t1);
+
+	rtl_pop(&t1);
+	t1 &= 0xffff;
+	rtl_sr_w(R_BP, &t1);
+ 	
+	rtl_pop(&t1);
+
+	rtl_pop(&t1);
+	t1 &= 0xffff;
+	rtl_sr_w(R_BX, &t1);
+
+	rtl_pop(&t1);
+	t1 &= 0xffff;
+	rtl_sr_w(R_DX, &t1);
+
+	rtl_pop(&t1);
+	t1 &= 0xffff;
+	rtl_sr_w(R_CX, &t1);
+
+	rtl_pop(&t1);
+	t1 &= 0xffff;
+	rtl_sr_w(R_AX, &t1);
+
+  }
+  else{
+	rtl_pop(&cpu.edi);
+	rtl_pop(&cpu.esi);
+	rtl_pop(&cpu.ebp);
+	rtl_pop(&t1);
+	rtl_pop(&cpu.ebx);
+	rtl_pop(&cpu.edx);
+	rtl_pop(&cpu.ecx);
+	rtl_pop(&cpu.eax);
+  }
+
   print_asm("popa");
 }
 
 make_EHelper(leave) {
-  //TODO();
-  rtl_mv(&cpu.esp,&cpu.ebp);//Set ESP to EBP
-  rtl_pop(&cpu.ebp);//pop EBP
+  if(decoding.is_operand_size_16){
+	rtl_lr_w(&t0, R_BP);
+	rtl_sr_w(R_SP, &t0);
+	rtl_pop(&t0);
+	t0 = t0 & 0xffff;
+	rtl_sr_w(R_BP, &t0);
+  }
+  else{
+	cpu.esp = cpu.ebp;
+	rtl_pop(&cpu.ebp);
+  }
+
   print_asm("leave");
 }
 
 make_EHelper(cltd) {
-  if (decoding.is_operand_size_16) {//CWD instruction，DX:AX(sign-extend of AX)
-    //TODO();
-    rtl_msb(&t0,&cpu.eax,2);//获取16位数的最高位，看看是否<0，即获取AX的最高位
-    if(t0 == 1)cpu.edx = cpu.edx | 0xffff;//AX<0，则以AX的符号位拓展DX
-    else cpu.edx = 0;
+  // DX:AX = sign-extend of AX
+  if (decoding.is_operand_size_16) {
+	rtl_lr_w(&t0, R_AX);
+	rtl_msb(&t0, &t0, 2);
+	if(t0 == 0){
+		t0 = 0x0000;
+		rtl_sr_w(R_DX, &t0);	
+	}
+	else{
+		t0 = 0xffff;
+		rtl_sr_w(R_DX, &t0);	
+	}
   }
-  else {//CDQ instruction,EDX:EAX(sign-extend of EAX)
-    //TODO();
-    rtl_msb(&t0,&cpu.eax,4);
-    if(t0 == 1)cpu.edx = cpu.edx | 0xffffffff;
-    else cpu.edx = 0;
+  else {
+	// bug rtl_lr_w(&t0, R_EAX);
+	rtl_lr_l(&t0, R_EAX);
+	rtl_msb(&t1, &t0, 4);
+	if(t1 == 0){
+		t0 = 0x00000000;
+		rtl_sr_l(R_EDX, &t0);	
+	}
+	else{
+		t0 = 0xffffffff;
+		rtl_sr_l(R_EDX, &t0);	
+	}
   }
+
   print_asm(decoding.is_operand_size_16 ? "cwtl" : "cltd");
 }
 
-make_EHelper(cwtl) {//Convert Byte to Word/Convert Word to Doubleword
-  if (decoding.is_operand_size_16) {//AX<-SignExtend(AL),Convert Byte to Word
-    //TODO();
-    rtl_sext(&t0,&cpu.eax,1);//进行符号拓展
-    cpu.eax = (cpu.eax & 0xffff0000) | (t0 & 0xffff);
+make_EHelper(cwtl) {
+  if (decoding.is_operand_size_16) {
+	rtl_lr_b(&t0, R_AL);
+	rtl_msb(&t0, &t0, 1);
+	if(t0 == 0){
+		t0 = 0x00;
+		rtl_sr_b(R_AH, &t0);	
+	}
+	else{
+		t0 = 0xff;
+		rtl_sr_b(R_AH, &t0);	
+	}
   }
-  else {//EAX<-SignExtend(AX),Convert Word to Doubleword
-    //TODO();
-    rtl_sext(&t0,&cpu.eax,2);
-    cpu.eax = t0;
+  else {
+	rtl_lr_w(&t0, R_AX);
+	rtl_msb(&t1, &t0, 2);
+	if(t1 == 0){
+		t2 = 0x00000000;
+		rtl_sr_l(R_EAX, &t2);
+		rtl_sr_w(R_AX, &t0);	
+	}
+	else{
+		t2 = 0xffffffff;
+		rtl_sr_l(R_EAX, &t2);
+		rtl_sr_w(R_AX, &t0);	
+	}
   }
 
   print_asm(decoding.is_operand_size_16 ? "cbtw" : "cwtl");

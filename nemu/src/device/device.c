@@ -37,7 +37,6 @@ static void timer_sig_handler(int signum) {
   Assert(ret == 0, "Can not set timer");
 }
 
-//进行一些设备的模拟操作，包括以50Hz的频率刷新屏幕，以及检测是否有按键按下/释放
 void device_update() {
   if (!device_update_flag) {
     return;
@@ -74,12 +73,11 @@ void sdl_clear_event_queue() {
   while (SDL_PollEvent(&event));
 }
 
-//初始化设备
 void init_device() {
-  init_serial();//初始化串口
-  init_timer();//初始化时钟
-  init_vga();//初始化VGA
-  init_i8042();//初始化键盘
+  init_serial();
+  init_timer();
+  init_vga();
+  init_i8042();
 
   struct sigaction s;
   memset(&s, 0, sizeof(s));
@@ -93,7 +91,6 @@ void init_device() {
   Assert(ret == 0, "Can not set timer");
 }
 #else
-
 
 void init_device() {
 }

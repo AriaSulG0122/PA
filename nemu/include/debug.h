@@ -17,7 +17,6 @@ extern FILE* log_fp;
 #	define Log_write(format, ...)
 #endif
 
-//***print the information of debugging.
 #define Log(format, ...) \
   do { \
     fprintf(stdout, "\33[1;34m[%s,%d,%s] " format "\33[0m\n", \
@@ -27,7 +26,6 @@ extern FILE* log_fp;
         __FILE__, __LINE__, __func__, ## __VA_ARGS__); \
   } while (0)
 
-//***while the test condition is false, print some information before assertion fail.
 #define Assert(cond, ...) \
   do { \
     if (!(cond)) { \
@@ -39,7 +37,6 @@ extern FILE* log_fp;
     } \
   } while (0)
 
-//***print information and then exit the program.
 #define panic(format, ...) \
   Assert(0, format, ## __VA_ARGS__)
 

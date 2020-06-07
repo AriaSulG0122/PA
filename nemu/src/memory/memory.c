@@ -1,168 +1,111 @@
-﻿#include "nemu.h"
-//*** Analog memory
+#include "nemu.h"
+#include "device/mmio.h"
+#include "memory/mmu.h"
+
 #define PMEM_SIZE (128 * 1024 * 1024)
 
-//控制寄存器标志
-#define CR0_PG 0x80000000 //Paging位
-
-//页表或页目录的present标志位
-#define PTE_P 0x001 //Present位
-
-//页表大小
-#define PGSIZE 4096
-
-//typedef uint32_t PTE;
-//typedef uint32_t PDE;
-//前十位是页目录项
-#define PDX(va) (((uint32_t)(va) >> 22) & 0x3ff)
-//中间十位是页表项
-#define PTX(va) (((uint32_t)(va) >> 12) & 0x3ff)
-//最后十二位是页内偏移
-#define OFF(va) ((uint32_t)(va)&0xfff)
-
-//在页表和页目录中的地址，取高20位
-#define PTE_ADDR(pte) ((uint32_t)(pte) & ~0xfff)
-
-#define pmem_rw(addr, type) *(type *)({                                       \
-  Assert(addr < PMEM_SIZE, "physical address(0x%08x) is out of bound", addr); \
-  guest_to_host(addr);                                                        \
-})
+#define pmem_rw(addr, type) *(type *)({\
+    Assert(addr < PMEM_SIZE, "physical address(0x%08x) is out of bound", addr); \
+    guest_to_host(addr); \
+    })
 
 uint8_t pmem[PMEM_SIZE];
 
 /* Memory accessing interfaces */
 
-paddr_t page_translate(vaddr_t addr, bool is_write)
-{
-  if (!cpu.cr0.paging)
-  {
-    Log("Paging is 0!");
-    return addr;
+uint32_t paddr_read(paddr_t addr, int len) {
+  int mmio= is_mmio(addr);
+  if(mmio != -1){
+	return mmio_read(addr, len, mmio);
   }
-  // Log("page_translate: addr: 0x%x\n", addr);
-  //获取页目录项
-  paddr_t dir = (addr >> 22) & 0x3ff;
-  //获取页表项
-  paddr_t page = (addr >> 12) & 0x3ff;
-  //获取页偏移
-  paddr_t offset = addr & 0xfff;
-  //获取页目录基址
-  paddr_t PDT_base = cpu.cr3.page_directory_base;
-  //Log("CR3:0x%08x",cpu.cr3.val);
-  //Log("page_translate: dir: 0x%x page: 0x%x offset: 0x%x PDT_base: 0x%x\n", dir, page, offset, PDT_base);
-  PDE pde;
-  //读取对应的页目录项
-  pde.val = paddr_read((PDT_base << 12) + (dir << 2), 4);
-  if (!pde.present)
-  { //检查p位
-    Log("page_translate: addr: 0x%08x,pde.val:0x%08x", addr,pde.val);
-    Log("page_translate: dir: 0x%x page: 0x%x offset: 0x%x PDT_base: 0x%x", dir, page, offset, PDT_base);
-    assert(pde.present);
-  }
-  PTE pte;
-  // Log("page_translate: page_frame: 0x%x\n", pde.page_frame);
-  //读取对应的页表项
-  pte.val = paddr_read((pde.page_frame << 12) + (page << 2), 4);
-  if (!pte.present)
-  {
-    //Log("page_translate: addr: 0x%x\n", addr);
-    assert(pte.present);
-  }
-  /*
-  if (addr == 0x8048000)
-  {
-    //Log("page_translate: dir: 0x%x, page: 0x%x, offset: 0x%x, PDT_base: 0x%x", dir, page, offset, PDT_base);
-    //Log("pde.val:0x%08x, pte.val:0x%08x", pde.val, pte.val);
-    //Log("Mydata:0x%08x", paddr_read(0x1d94120, 4));
-    return 0x1d93001;
-  }*/
-  paddr_t paddr = (pte.page_frame << 12) | offset;
-  // Log("page_translate: paddr: 0x%x\n", paddr);
-  return paddr;
+  return pmem_rw(addr, uint32_t) & (~0u >> ((4 - len) << 3));
 }
 
-//***Get the last 8|16|24|32 bits of pmem_rw(addr,uint32_t)
-uint32_t paddr_read(paddr_t addr, int len)
-{
-  //Log("paddr_read:0x%08x",addr);
-  if (is_mmio(addr) == -1)
-  { //为-1，则不是内存映射I/O的访问
-    return pmem_rw(addr, uint32_t) & (~0u >> ((4 - len) << 3));
+void paddr_write(paddr_t addr, int len, uint32_t data) {
+  int mmio= is_mmio(addr);
+  if(mmio != -1){
+	return mmio_write(addr, len, data, mmio);
   }
-  else
-  {
-    return mmio_read(addr, len, is_mmio(addr)); //根据映射号访问内存映射I/O
-  }
-  //***(4-len)<<3 = (4-len)*2^3,     ~ = take inverse
+  memcpy(guest_to_host(addr), &data, len);
 }
 
-void paddr_write(paddr_t addr, int len, uint32_t data)
-{
-  if (is_mmio(addr) == -1)
-  {
-    memcpy(guest_to_host(addr), &data, len);
-  }
-  else
-  {
-    mmio_write(addr, len, data, is_mmio(addr));
-  }
+paddr_t page_translate(vaddr_t vaddr, bool dirty){
+	if(cpu.PG!=1){
+		return vaddr;
+	}
+	else{
+		paddr_t basePDE = cpu.cr3;
+		paddr_t addrPDE = basePDE + (vaddr>>22) * 4;
+		paddr_t pde = paddr_read(addrPDE, 4);
+		assert(pde & 0x1);
+
+		paddr_t basePTE = pde & 0xfffff000;
+		paddr_t addrPTE = basePTE + ((vaddr>>12) & 0x3ff) * 4;
+		paddr_t pte = paddr_read(addrPTE, 4);
+		assert(pte & 0x1);
+
+		paddr_t basePage = pte & 0xfffff000;
+		paddr_t page = basePage + (vaddr & 0xfff);
+		
+		if(dirty){
+			pde |= 0x60;
+			pte |= 0x60;
+		}
+		else{
+			pde |= 0x20;
+			pte |= 0x20;	
+		}
+		paddr_write(addrPDE, 4, pde);
+		paddr_write(addrPTE, 4, pte);
+
+		return page;
+	}
 }
 
-bool is_cross_boundry(vaddr_t addr, int len)
-{
-  bool result;
-  result = (((addr + len - 1) & ~PAGE_MASK) != (addr & ~PAGE_MASK)) ? true : false;
-  return result;
+uint32_t vaddr_read(vaddr_t addr, int len) {
+	if((addr & 0xfff) + len > 0x1000){
+		paddr_t paddr = page_translate(addr, false);
+		uint32_t low = paddr_read(
+			paddr, 
+			(int)(0x1000-(addr & 0xfff)));
+
+		paddr = page_translate(
+			addr + (int)(0x1000-(addr & 0xfff)), 
+			false);
+		uint32_t high = paddr_read(
+			paddr, 
+			len - (int)(0x1000-(addr & 0xfff)));
+		
+		return (high << ((0x1000 - (addr & 0xfff)) * 8)) + low;
+	}
+	else{
+		paddr_t paddr = page_translate(addr, false);
+		return paddr_read(paddr, len);
+	}
 }
 
-// ***x86 is small end.
-uint32_t vaddr_read(vaddr_t addr, int len)
-{
-  //如果发现 CR0 的 PG 位为 1,则开启分页机制
-  if (cpu.cr0.paging)
-  {
-    //数据跨越了边界，则要进行两次转换
-    if (OFF(addr) + len > PGSIZE)
-    {
-      //assert(0);
-      int firstLen = PGSIZE - OFF(addr);
-      int secondLen = len - firstLen;
+void vaddr_write(vaddr_t addr, int len, uint32_t data) {
+	if((addr & 0xfff) + len > 0x1000){
+		uint32_t high = data >> ((0x1000 - (addr & 0xfff)) * 8);
+		uint32_t low = 
+			data & ((1<<((0x1000-(addr & 0xfff))*8))-1);		
+	
+		paddr_t paddr = page_translate(addr, true);
+		paddr_write(
+			paddr,
+			0x1000-(addr & 0xfff), 
+			low);
 
-      uint32_t first = paddr_read(page_translate(addr, false), firstLen);
-      uint32_t second = paddr_read(page_translate(addr + firstLen, false), secondLen);
-      //Log("First Add:0x%08x,Second Add:0x%08x",page_translate(addr,false),page_translate(addr + firstLen,false));
-      //Log("vaddr:0x%08x,paddr:0x%08x",addr,second << (8 * firstLen) | first);
-      //对两次转换结果进行拼接
-      return (second << (8 * firstLen)) | first;
-    }
-    else
-    { //否则直接转换就行了
-      if (addr == 0x8048000)
-      {
-        //Log("vaddr:0x%08x,paddr:0x%08x", addr, page_translate(addr, false));
-      }
-      return paddr_read(page_translate(addr, false), len);
-    }
-  }
-  return paddr_read(addr, len);
-}
-
-void vaddr_write(vaddr_t addr, int len, uint32_t data)
-{
-  // 当CR0的PG位为1则开启分页模式
-  if (cpu.cr0.paging)
-  {
-    if (OFF(addr) + len > PGSIZE)
-    {
-      assert(0); //跨越边界，报错
-    }
-    else
-    {
-      paddr_write(page_translate(addr, true), len, data);
-    }
-  }
-  else
-  {
-    paddr_write(addr, len, data);
-  }
+		paddr = page_translate(
+			addr + 0x1000-(addr & 0xfff), 
+			true);
+		paddr_write(
+			paddr,
+			len - (int)(0x1000-(addr & 0xfff)), 
+			high);
+	}
+	else{
+		paddr_t paddr = page_translate(addr, true);
+		paddr_write(paddr, len, data);
+	}
 }

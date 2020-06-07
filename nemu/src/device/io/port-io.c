@@ -7,7 +7,6 @@
 /* "+ 3" is for hacking, see pio_read() below */
 static uint8_t pio_space[PORT_IO_SPACE_MAX + 3];
 
-//记录一个端口I/O映射的关系
 typedef struct {
   ioaddr_t low;
   ioaddr_t high;
@@ -28,7 +27,6 @@ static void pio_callback(ioaddr_t addr, int len, bool is_write) {
 }
 
 /* device interface */
-//设备在初始化时调用该函数来注册一个端口I/O映射关系，返回该映射关系的I/O映射空间首地址
 void* add_pio_map(ioaddr_t addr, int len, pio_callback_t callback) {
   assert(nr_map < NR_MAP);
   assert(addr + len <= PORT_IO_SPACE_MAX);
@@ -41,7 +39,6 @@ void* add_pio_map(ioaddr_t addr, int len, pio_callback_t callback) {
 
 
 /* CPU interface */
-//面向CPU的端口I/O读接口，从地址addr读取len字节长度
 uint32_t pio_read(ioaddr_t addr, int len) {
   assert(len == 1 || len == 2 || len == 4);
   assert(addr + len - 1 < PORT_IO_SPACE_MAX);
@@ -50,7 +47,6 @@ uint32_t pio_read(ioaddr_t addr, int len) {
   return data;
 }
 
-//面向CPU的端口I/O写接口，从地址addr写入len长度的数据data
 void pio_write(ioaddr_t addr, int len, uint32_t data) {
   assert(len == 1 || len == 2 || len == 4);
   assert(addr + len - 1 < PORT_IO_SPACE_MAX);

@@ -23,9 +23,7 @@ void serial_io_handler(ioaddr_t addr, int len, bool is_write) {
   }
 }
 
-//串口初始化
 void init_serial() {
-  //注册0x3F8处长度为8个字节的端口作为其寄存器，代码只模拟了两个寄存器的功能
   serial_port_base = add_pio_map(SERIAL_PORT, 8, serial_io_handler);
   serial_port_base[LSR_OFFSET] = 0x20; /* the status is always free */
 }

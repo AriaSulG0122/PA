@@ -1,6 +1,6 @@
 #include "nemu.h"
 #include <unistd.h>
-//***Agreed memory location
+
 #define ENTRY_START 0x100000
 
 void init_difftest();
@@ -77,19 +77,28 @@ static inline void load_img() {
 #ifdef DIFF_TEST
   gdb_memcpy_to_qemu(ENTRY_START, guest_to_host(ENTRY_START), size);
 #endif
-}//***end load_img
+}
 
 static inline void restart() {
   /* Set the initial instruction pointer. */
-  
-  cpu.eip = ENTRY_START;//***initialize eip
-  cpu.eflags=0x0000002;//为EFLAGS设置初始值
+  cpu.eip = ENTRY_START;
+  cpu.eflags._0 = 0;
+  cpu.eflags._1 = 0;
+  cpu.eflags._2 = 0;
+  cpu.eflags.OF = 0;
+  cpu.eflags._3 = 0;
+  cpu.eflags.IF = 0;
+  cpu.eflags._4 = 0;
+  cpu.eflags.SF = 0;
+  cpu.eflags.ZF = 0;
+  cpu.eflags._5 = 0;
+  cpu.eflags._6 = 1;
+  cpu.eflags.CF = 0;
 
-  cpu.CS=0x8;//初始化CS寄存器
+  cpu.cs = 8;
 
-  cpu.cr0.val=0x60000011;
+  cpu.cr0=0x60000011;
 
-//把QEMU的通用寄存器设置成和NEMU一样
 #ifdef DIFF_TEST
   init_qemu_reg();
 #endif
@@ -110,8 +119,8 @@ static inline void parse_args(int argc, char *argv[]) {
     }
   }
 }
-//***Called by main function
-int  init_monitor(int argc, char *argv[]) {
+
+int init_monitor(int argc, char *argv[]) {
   /* Perform some global initialization. */
 
   /* Parse arguments. */
@@ -121,11 +130,8 @@ int  init_monitor(int argc, char *argv[]) {
   init_log();
 
   /* Test the implementation of the `CPU_state' structure. */
-  //***create some random data, and test if the regs was set correct!
-  //***if not correct, it will trigger assertion fail.
   reg_test();
 
-//如果定义了DIFF_TEST(在include/common.h中)，那么在这里调用init_difftest函数来启动QEMU
 #ifdef DIFF_TEST
   /* Fork a child process to perform differential testing. */
   init_difftest();

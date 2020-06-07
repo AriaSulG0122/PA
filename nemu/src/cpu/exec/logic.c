@@ -1,76 +1,120 @@
 #include "cpu/exec.h"
 
 make_EHelper(test) {
-  //TODO();
-  rtl_and(&t2, &id_dest->val, &id_src->val);//利用rtl基本操作进行运算
-  //更新各个标志位
-  rtl_update_ZFSF(&t2, id_dest->width);
   rtl_set_OF(&tzero);
   rtl_set_CF(&tzero);
+  rtl_and(&t2, &id_dest->val, &id_src->val);
+  rtl_update_ZFSF(&t2, id_dest->width);
+
   print_asm_template2(test);
 }
 
 make_EHelper(and) {
-  //TODO();
-  rtl_and(&t2, &id_dest->val, &id_src->val);//利用rtl基本操作进行运算
-  operand_write(id_dest, &t2);//完成计算，写入结果
-  //更新各个标志位
-  rtl_update_ZFSF(&t2, id_dest->width);
   rtl_set_OF(&tzero);
   rtl_set_CF(&tzero);
+
+  rtl_and(&t2, &id_dest->val, &id_src->val);
+  operand_write(id_dest, &t2);
+  rtl_update_ZFSF(&t2, id_dest->width);
+
   print_asm_template2(and);
 }
 
 make_EHelper(xor) {
-  //TODO();
-  rtl_xor(&t2, &id_dest->val, &id_src->val);//利用rtl基本操作进行运算
-  operand_write(id_dest, &t2);//完成计算，写入结果
-  //更新各个标志位
+  rtl_xor(&t2, &id_dest->val, &id_src->val);
+  operand_write(id_dest, &t2);
+
   rtl_update_ZFSF(&t2, id_dest->width);
-  rtl_set_OF(&tzero);
-  rtl_set_CF(&tzero);
+
+  rtl_li(&t0, 0);
+  rtl_set_CF(&t0);
+  rtl_set_OF(&t0);
+
   print_asm_template2(xor);
 }
 
 make_EHelper(or) {
-  //TODO();
-  rtl_or(&t2, &id_dest->val, &id_src->val);//利用rtl基本操作进行运算
-  operand_write(id_dest, &t2);//完成计算，写入结果
-  //更新各个标志位
-  rtl_update_ZFSF(&t2, id_dest->width);
   rtl_set_OF(&tzero);
   rtl_set_CF(&tzero);
+
+  rtl_or(&t2, &id_dest->val, &id_src->val);
+  operand_write(id_dest, &t2);
+  rtl_update_ZFSF(&t2, id_dest->width);
+
   print_asm_template2(or);
 }
 
 make_EHelper(sar) {
-  //TODO();
-  // unnecessary to update CF and OF in NEMU
-  rtl_sar(&t2, &id_dest->val, &id_src->val);//利用rtl基本操作进行运算
-  operand_write(id_dest, &t2);//完成计算，写入结果
-  //更新ZF和SF
+  rtl_sar(&t2, &id_dest->val, &id_src->val);
+  operand_write(id_dest, &t2);
   rtl_update_ZFSF(&t2, id_dest->width);
+  // unnecessary to update CF and OF in NEMU
+
   print_asm_template2(sar);
 }
 
 make_EHelper(shl) {
-  //TODO();
   // unnecessary to update CF and OF in NEMU
-  rtl_shl(&t2, &id_dest->val, &id_src->val);//利用rtl基本操作进行运算
-  operand_write(id_dest, &t2);//完成计算，写入结果
-  //更新ZF和SF
+  rtl_shl(&t2, &id_dest->val, &id_src->val);
+  operand_write(id_dest, &t2);
   rtl_update_ZFSF(&t2, id_dest->width);
   print_asm_template2(shl);
 }
 
 make_EHelper(shr) {
-  //TODO();
-  // unnecessary to update CF and OF in NEMU
-  rtl_shr(&t2, &id_dest->val, &id_src->val);//利用rtl基本操作进行运算
-  operand_write(id_dest, &t2);//完成计算，写入结果
-  //更新ZF和SF
+  rtl_shr(&t2, &id_dest->val, &id_src->val);
+  operand_write(id_dest, &t2);
   rtl_update_ZFSF(&t2, id_dest->width);
+  // unnecessary to update CF and OF in NEMU
+
+
   print_asm_template2(shr);
+}
+
+make_EHelper(rol) {
+  rtl_roi(&t2, &id_dest->val, &id_src->val);
+  operand_write(id_dest, &t2);
+
+
+  print_asm_template2(shr);
+}
+
+make_EHelper(shrd) {
+	if(decoding.is_operand_size_16){
+		rtl_shr(&t0, &id_dest->val, &id_src->val);
+		t1 = 16 - id_src->val;
+		rtl_shl(&t2, &id_src2->val, &t1); 
+		rtl_or(&t3, &t0, &t2);
+		operand_write(id_dest, &t3);
+		rtl_update_ZFSF(&t3, id_dest->width);
+	}
+	else{
+		rtl_shr(&t0, &id_dest->val, &id_src->val);
+		t1 = 32 - id_src->val;
+		rtl_shl(&t2, &id_src2->val, &t1); 
+		rtl_or(&t3, &t0, &t2);
+		operand_write(id_dest, &t3);
+		rtl_update_ZFSF(&t3, id_dest->width);
+	}
+}
+
+make_EHelper(shld) {
+	if(decoding.is_operand_size_16){
+		rtl_shl(&t0, &id_dest->val, &id_src->val);
+		t1 = 16 - id_src->val;
+		rtl_shr(&t2, &id_src2->val, &t1); 
+		rtl_or(&t3, &t0, &t2);
+		operand_write(id_dest, &t3);
+		rtl_update_ZFSF(&t3, id_dest->width);
+	}
+	else{
+		rtl_shl(&t0, &id_dest->val, &id_src->val);
+		t1 = 32 - id_src->val;
+		rtl_shr(&t2, &id_src2->val, &t1); 
+		rtl_or(&t3, &t0, &t2);
+		operand_write(id_dest, &t3);
+		rtl_update_ZFSF(&t3, id_dest->width);
+	}
 }
 
 make_EHelper(setcc) {
@@ -82,33 +126,7 @@ make_EHelper(setcc) {
 }
 
 make_EHelper(not) {
-  //TODO();
-  rtl_mv(&t2,&id_dest->val);
-  rtl_not(&t2);
-  operand_write(id_dest,&t2);
+  rtl_not(&id_dest->val);
+  operand_write(id_dest, &id_dest->val);
   print_asm_template1(not);
-}
-
-//原框架中没有该指令，自己添加
-make_EHelper(rol) {
-  rtl_shl(&t0,&id_dest->val,&id_src->val);//左移n
-  rtl_shri(&t1,&id_dest->val,id_dest->width*8-id_src->val);//对于最左边的位，左移n相当于右移width-n
-  rtl_or(&t0,&t1,&t0);
-  operand_write(id_dest, &t0);
-
-  //注意，下面的部分按照手册P372来
-  rtl_get_CF(&t2);//得到CF位
-  t0 = id_src->val; //count
-  if(t0 == 1)
-  {
-      rtl_msb(&t1,&id_dest->val,id_dest->width);//Get high-order bit of r/m
-      if(t2!=t1)
-      {
-          rtl_set_OF(&t0);
-      }
-      else{
-          rtl_set_OF(&tzero);
-      }
-  }
-  print_asm_template2(rol);
 }
